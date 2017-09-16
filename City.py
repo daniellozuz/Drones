@@ -29,7 +29,7 @@ class City(object):
 
 
     def __str__(self):
-        '''Provides printing of a city.'''
+        '''Provides printing of a city'''
 
         string = '=' * 40 + ' City description ' + '=' * 40
         string += "\nWind's strength: {wind}\n".format(wind=self.wind)
