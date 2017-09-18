@@ -1,6 +1,8 @@
 from Drone import Drone
 from Parcel import Parcel
 import algorithms
+import plots
+import random
 
 
 class City(object):
@@ -60,12 +62,14 @@ if __name__ == '__main__':
     city = City(position=(0,0), wind=(1, 2))
     city += Drone(1, 40, 8)
     city += Drone(2, 103, 15)
-    city += Parcel(1, 20, (1, 2))
-    city += Parcel(2, 15, (0, 7))
-    city += Parcel(3, 5, (-1, -5))
+
+    for i in range(25):
+        city += Parcel(i + 1, random.randint(50, 100), (random.randint(-20, 20), random.randint(-20, 20)))
 
     print(city)
     print(city.total_distance)
     city.distribute()
     print(city)
     print(city.total_distance)
+
+    plots.show_parcels(city)
