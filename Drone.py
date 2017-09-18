@@ -2,16 +2,25 @@ class Drone(object):
     '''Class implements drone creation and specification.'''
 
 
+    # I would probably get rid of it in the future (redundancy - City has it).
     drone_list = []
 
 
-    def __init__(self, _id, max_capacity, max_speed):
+    def __init__(self, _id, max_capacity, max_speed, parcels=[]):
         '''Creates a drone and appends it to internal drone_list.'''
 
         self._id = _id
         self.max_capacity = max_capacity
         self.max_speed = max_speed
+        self.parcels = parcels
         Drone.drone_list.append(self)
+
+
+    def __add__(self, parcel):
+        '''Assigns a parcel to a drone.'''
+
+        self.parcels.append(parcel)
+        return self
 
 
     def __str__(self):
@@ -20,6 +29,7 @@ class Drone(object):
         string = 'Drone ID: {:>6}\n'.format(self._id)
         string += 'Max capacity: {:>4}\n'.format(self.max_capacity)
         string += 'Max speed: {:>7}\n'.format(self.max_speed)
+        string += 'Parcels assigned: {:>4}\n'.format(len(self.parcels))
         return string
 
 
@@ -29,6 +39,7 @@ class Drone(object):
         string = 'Drone ID: {:>6}\n'.format(self._id)
         string += 'Max capacity: {:>4}\n'.format(self.max_capacity)
         string += 'Max speed: {:>7}\n'.format(self.max_speed)
+        string += 'Parcels assigned: {:>4}\n'.format(len(self.parcels))
         return string
 
 

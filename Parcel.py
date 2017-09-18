@@ -1,7 +1,10 @@
 class Parcel(object):
-    '''Class implements parcel creation and specification.'''
+    '''Class implements parcel creation and specification.
+    
+    Normally Parcels would be assigned to a City, then within that city, assigned to drones.
+    '''
 
-
+    # I would probably get rid of it in the future (redundancy - City has it).
     parcel_list = []
 
 
