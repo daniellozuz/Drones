@@ -13,3 +13,21 @@ def show_parcels(city):
     plt.xlabel('X')
     plt.ylabel('Y')
     plt.show()
+
+
+def show_drone_paths(city):
+    '''Shows drones paths on a map.'''
+
+    for drone in city.drones:
+        occupied_capacity = 0
+        path = [city.position]
+        for parcel in drone.parcels:
+            occupied_capacity += parcel.weight
+            if occupied_capacity > drone.max_capacity:
+                path.append(city.position)
+                occupied_capacity = 0
+            path.append(parcel.position)
+        path.append(city.position)
+        if path:
+            plt.plot(*zip(*path))
+    plt.show()

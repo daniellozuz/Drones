@@ -1,12 +1,15 @@
+"""This class is a data representation of the whole system."""
+
+
 from Drone import Drone
 from Parcel import Parcel
-import algorithms
 import plots
-import random
 
 
-class City(object):
-    '''Class implements city creation, access to drones and parcels, and drone trajectories.'''
+class City():
+    """Class implements city creation, access to drones and parcels, and drone trajectories.
+    
+    Inherits numerical methods from Algorithms."""
 
 
     def __init__(self, position=(0, 0), wind=(0, 0)):
@@ -54,17 +57,17 @@ class City(object):
         '''Passes drones and parcels to one of optimizing functions from algorithms module.'''
 
         if method == 'random':
-            self.total_distance = algorithms.alg_random(self.drones, self.parcels, self.position)
+            self.total_distance = Algorithms.alg_random(self.drones, self.parcels, self.position)
 
 
 if __name__ == '__main__':
-
+    from random import randint
     city = City(position=(0,0), wind=(1, 2))
     city += Drone(1, 40, 8)
     city += Drone(2, 103, 15)
 
     for i in range(25):
-        city += Parcel(i + 1, random.randint(50, 100), (random.randint(-20, 20), random.randint(-20, 20)))
+        city += Parcel(i + 1, randint(10, 40), (randint(-20, 20), randint(-20, 20)))
 
     print(city)
     print(city.total_distance)
@@ -73,3 +76,4 @@ if __name__ == '__main__':
     print(city.total_distance)
 
     plots.show_parcels(city)
+    plots.show_drone_paths(city)
