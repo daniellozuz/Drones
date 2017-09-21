@@ -1,8 +1,7 @@
-"""This module is an interface to the while program.
+"""This module defines program behaviour.
 
 We instantiate a city, provide it with data, and call appropriate
-methods to manupulate data and receive results or visualization
-(mostly plots and algorithms modules)."""
+methods to manupulate data and receive results or visualization."""
 
 
 from random import randint
@@ -17,7 +16,7 @@ import plots
 # City creation
 city = City(position=(0, 0), wind=(1, 2))
 
-city += Drone(1, 40, 8)
+city += Drone(1, 140, 8)
 city += Drone(2, 103, 15)
 
 for i in range(25):
@@ -31,9 +30,11 @@ plots.show_parcels(city)
 plots.show_drone_paths(city)
 prev_best = city.total_distance
 
-for i in range(100):    
+for i in range(1000):
     city.try_scrambling_parcels()
     print(city.total_distance)
     if city.total_distance < prev_best:
         plots.show_drone_paths(city)
         prev_best = city.total_distance
+
+plots.show_distance_history(city)
