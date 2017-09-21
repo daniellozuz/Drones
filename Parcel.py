@@ -4,9 +4,6 @@ class Parcel(object):
     Normally Parcels would be assigned to a City, then within that city, assigned to drones.
     '''
 
-    # I would probably get rid of it in the future (redundancy - City has it).
-    parcel_list = []
-
 
     def __init__(self, _id, weight, position):
         '''Creates a parcel and appends it to internal parcel_list.'''
@@ -14,7 +11,6 @@ class Parcel(object):
         self._id = _id
         self.weight = weight
         self.position = position
-        Parcel.parcel_list.append(self)
 
 
     def __str__(self):

@@ -2,10 +2,6 @@ class Drone(object):
     '''Class implements drone creation and specification.'''
 
 
-    # I would probably get rid of it in the future (redundancy - City has it).
-    drone_list = []
-
-
     def __init__(self, _id, max_capacity, max_speed, parcels=[]):
         '''Creates a drone and appends it to internal drone_list.'''
 
@@ -13,7 +9,8 @@ class Drone(object):
         self.max_capacity = max_capacity
         self.max_speed = max_speed
         self.parcels = parcels
-        Drone.drone_list.append(self)
+        self.path = []
+        self.path_length = 0
 
 
     def __add__(self, parcel):
@@ -41,6 +38,33 @@ class Drone(object):
         string += 'Max speed: {:>7}\n'.format(self.max_speed)
         string += 'Parcels assigned: {:>4}\n'.format(len(self.parcels))
         return string
+    
+
+    def update(self, base=(0, 0)):
+        """Recalculates drone's parameters after modifications/alterations."""
+
+        occupied_capacity = 0
+        self.path = [base]
+        for parcel in self.parcels:
+            occupied_capacity += parcel.weight
+            if occupied_capacity > self.max_capacity:
+                self.path.append(base)
+                occupied_capacity = 0
+            self.path.append(parcel.position)
+        self.path.append(base)
+
+        self.recalculate_path_length()
+
+
+    def recalculate_path_length(self):
+        """Recalculates path length."""
+
+        dist = lambda x, y: ((x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2) ** 0.5
+
+        self.path_length = 0
+        for point1, point2 in zip(self.path[:-1], self.path[1:]):
+            self.path_length += dist(point1, point2)
+
 
 
 if __name__ == '__main__':

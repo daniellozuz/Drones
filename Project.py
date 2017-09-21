@@ -2,7 +2,7 @@
 
 We instantiate a city, provide it with data, and call appropriate
 methods to manupulate data and receive results or visualization
-(mostly Plots and Algorithms classes)."""
+(mostly plots and algorithms modules)."""
 
 
 from random import randint
@@ -11,7 +11,6 @@ from City import City
 from Drone import Drone
 from Parcel import Parcel
 
-import Algorithms
 import plots
 
 
@@ -28,8 +27,13 @@ for i in range(25):
 # Computations and Visualization
 city.scramble_parcels()
 print(city.total_distance)
-city.scramble_parcels()
-print(city.total_distance)
 plots.show_parcels(city)
 plots.show_drone_paths(city)
+prev_best = city.total_distance
 
+for i in range(100):    
+    city.try_scrambling_parcels()
+    print(city.total_distance)
+    if city.total_distance < prev_best:
+        plots.show_drone_paths(city)
+        prev_best = city.total_distance

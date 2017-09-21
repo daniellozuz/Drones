@@ -30,4 +30,5 @@ def show_drone_paths(city):
         path.append(city.position)
         if path:
             plt.plot(*zip(*path))
+    plt.title('Total distance: ' + str(round(city.total_distance, 2)))
     plt.show()
