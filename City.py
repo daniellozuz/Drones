@@ -6,7 +6,7 @@ Calling its methods enables:
 
     drone and parcel creation,
 
-    numerical computations - rearranging parcels among drones and recalculating results. """
+    numerical computations - rearranging parcels among drones and recalculating results."""
 
 
 import random
@@ -17,12 +17,14 @@ from Parcel import Parcel
 import plots
 
 
+# TODO @classmethods as means of reading data from txt file and loading it into City
+# XXX I need only 1 City, should I even bother to make object or work on a class?
+
 class City():
     """Main interface with the data."""
 
 
     def __init__(self, position=(0, 0), wind=(0, 0)):
-        """Creates a city and initializes its state."""
         # TODO implement a way to create random data (specify number of drones and parcels to be randomly added).
         # TODO implement saving to and reading from a file (testing purposes, samples, which would be a reference to algorithm performance).
 
@@ -35,7 +37,6 @@ class City():
 
 
     def __add__(self, item):
-        """Adds a drone or parcel to city."""
         # TODO implement additions of whole lists of drones and/or parcels.
 
         if isinstance(item, Drone):
@@ -48,22 +49,32 @@ class City():
 
 
     def __str__(self):
-        """Provides printable representation of a city."""
-
         string = '=' * 40 + ' City description ' + '=' * 40 + '\n'
         string += f'Wind speed: {self.wind}\n'
-
         string += f'\nThere are {len(self.drones)} drones in the city:\n'
-        string += '{:>20}{:>20}{:>20}{:>20}\n'.format('Drone ID', 'Max capacity', 'Max speed', 'Parcels assigned')
+        string += '{:>20}'.format('Drone ID')
+        string += '{:>20}'.format('Max capacity')
+        string += '{:>20}'.format('Max speed')
+        string += '{:>20}\n'.format('Parcels assigned')
         for drone in self.drones:
             string += str(drone)
-
         string += f'\nThere are {len(self.parcels)} parcels in the city:\n'
-        string += '{:>20}{:>20}{:>20}\n'.format('Parcel ID', 'Weight', 'Position')
+        string += '{:>20}'.format('Parcel ID')
+        string += '{:>20}'.format('Weight')
+        string += '{:>20}\n'.format('Position')
         for parcel in self.parcels:
             string += str(parcel)
-
         return string
+
+
+    @classmethod
+    def set_wind(cls, wind):
+        """Sets class attribute wind to given value."""
+
+        if isinstance(wind, tuple) and len(wind) == 2:
+            cls.wind = wind
+        else:
+            raise TypeError
 
 
     def scramble_parcels(self):
@@ -118,6 +129,8 @@ class City():
 
 
 
+
+
 if __name__ == '__main__':
     # TODO Create tests, check how to do this (doctest or unittest)
     from random import randint
@@ -136,3 +149,9 @@ if __name__ == '__main__':
 
     plots.show_parcels(city)
     plots.show_drone_paths(city)
+
+    # TODO XXX Class City and its object city or class City as a container for data (operating on class)
+    print(city.wind)
+    city.set_wind((10, 20))
+    print(city.wind)
+    print(City.wind)

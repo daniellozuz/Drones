@@ -3,20 +3,19 @@ class Parcel(object):
 
 
     def __init__(self, number, weight, position):
-        """Parcel creation."""
-
         self.number = number
         self.weight = weight
         self.position = position
 
 
     def __str__(self):
-        """Provides printable representation of a parcel."""
-
         string = '{:>20}'.format(self.number)
         string += '{:>20}'.format(self.weight)
         string += '{:>20}\n'.format(str(self.position))
         return string
+
+
+
 
 
 if __name__ == '__main__':
