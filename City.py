@@ -9,6 +9,7 @@ Calling its methods enables:
     numerical computations - rearranging parcels among drones and recalculating results."""
 
 
+import math
 import random
 
 from Drone import Drone
@@ -18,7 +19,7 @@ import plots
 
 
 # TODO @classmethods as means of reading data from txt file and loading it into City
-# XXX I need only 1 City, should I even bother to make object or work on a class?
+
 
 class City():
     """Main interface with the data."""
@@ -36,16 +37,17 @@ class City():
         self.parcels = []
 
 
-    def __add__(self, item):
-        # TODO implement additions of whole lists of drones and/or parcels.
-
-        if isinstance(item, Drone):
-            self.drones.append(item)
-            return self
-
-        if isinstance(item, Parcel):
-            self.parcels.append(item)
-            return self
+    def __add__(self, items):
+        if isinstance(items, Drone) or isinstance(items, Parcel):
+            items = [items]
+        for item in items:
+            if isinstance(item, Drone):
+                self.drones.append(item)
+                return self
+            if isinstance(item, Parcel):
+                self.parcels.append(item)
+                return self
+        return NotImplemented
 
 
     def __str__(self):
@@ -93,23 +95,60 @@ class City():
     def try_scrambling_parcels(self):
         """Performs random redistribution of parcels to drones (undone if no improvement)."""
 
+        # Save previous state.
         import copy
-
         prev_drones = []
         prev_distance = self.total_distance
-
         for drone in self.drones:
             prev_drones.append(copy.deepcopy(drone))
+        
+        # Clear state and reassign parcels randomly.
+        for drone in self.drones:
             drone.parcels = []
-
         for parcel in self.parcels:
             drone = random.choice(self.drones)
             drone += parcel
 
+        # Check results and decide whether the new solution is kept
+        # TODO there is the part of simulated annealing I need to implement
+        self.total_distance = self._calculate_total_distance()
+        self.total_distances.append(self.total_distance)
+        if self.total_distance >= prev_distance:
+            for drone, prev_drone in self.drones, prev_drones:
+                drone = prev_drone
+            self.total_distance = self._calculate_total_distance()
+
+
+    def simulated_annealing(self, k, t):
+        """Performs simulated annealing algorithm."""
+
+        # Save previous state.
+        import copy
+        prev_drones = []
+        prev_distance = self.total_distance
+        for drone in self.drones:
+            prev_drones.append(copy.deepcopy(drone))
+
+        # Clear state and reassign parcels randomly.
+        # TODO instead of this random shit implement a swapping function. swap(between_drones, positions)
+        for drone in self.drones:
+            drone.parcels = []
+        for parcel in self.parcels:
+            drone = random.choice(self.drones)
+            drone += parcel
+
+        # Check results and decide whether the new solution is kept
+        # TODO there is the part of simulated annealing I need to implement
         self.total_distance = self._calculate_total_distance()
         self.total_distances.append(self.total_distance)
 
-        if self.total_distance >= prev_distance:
+        # TODO check how does this behave
+        #print('Improvement:', self.total_distance - prev_distance)
+        #print('Weird value:', (1 / (math.e ** ((self.total_distance - prev_distance) / (k * t)) + 1)))
+        if (1 / (math.e ** ((self.total_distance - prev_distance) / (k * t)) + 1) > random.random()):
+            print('Passed.')
+        else:
+            print('Revert.')
             for drone, prev_drone in self.drones, prev_drones:
                 drone = prev_drone
             self.total_distance = self._calculate_total_distance()
@@ -126,6 +165,31 @@ class City():
             distance += drone.path_length
 
         return distance
+
+
+    def _swap(self, x, y):
+        # TODO try fixing it so that it really swaps those parcels
+        print('Showing before')
+        plots.show_drone_paths(self)
+
+        drone1index = random.randint(0, len(self.drones)-1)
+        drone2index = random.randint(0, len(self.drones)-1)
+        print(drone1index, drone2index)
+
+        drone1 = self.drones[drone1index]
+        drone2 = self.drones[drone2index]
+
+        parcel1index = random.randint(0, len(drone1.parcels)-1)
+        parcel2index = random.randint(0, len(drone2.parcels)-1)
+        print(parcel1index, parcel2index)
+        print(self.drones[drone1index].parcels[parcel1index], self.drones[drone2index].parcels[parcel2index])
+
+        self.drones[drone1index].parcels[parcel1index], self.drones[drone2index].parcels[parcel2index] = self.drones[drone2index].parcels[parcel2index], self.drones[drone1index].parcels[parcel1index]
+        print(self.drones[drone1index].parcels[parcel1index], self.drones[drone2index].parcels[parcel2index])
+        for drone in self.drones:
+            drone.update()
+        print('Showing after')
+        plots.show_drone_paths(self)
 
 
 
@@ -155,3 +219,7 @@ if __name__ == '__main__':
     city.set_wind((10, 20))
     print(city.wind)
     print(City.wind)
+
+    city.simulated_annealing(0.01, 1000)
+
+    city._swap(1, 2)

@@ -15,14 +15,13 @@ def show_drone_paths(city):
     """Shows drones paths on a map."""
     # TODO Legend.
     # TODO Just plot drone.path
-    plt.ion()
+    #plt.ion()
     plt.clf()
     for drone in city.drones:
         if drone.path:
             plt.plot(*zip(*drone.path))
         else:
             print("Error: no path to be displayed.")
-        
     plt.title('Total distance: ' + str(round(city.total_distance, 2)))
     plt.show()
     show_parcels(city)

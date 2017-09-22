@@ -1,3 +1,5 @@
+from Parcel import Parcel
+
 class Drone(object):
     """Provides drone implementation."""
 
@@ -15,8 +17,10 @@ class Drone(object):
 
 
     def __add__(self, parcel):
-        self.parcels.append(parcel)
-        return self
+        if isinstance(parcel, Parcel):
+            self.parcels.append(parcel)
+            return self
+        return NotImplemented
 
 
     def __str__(self):

@@ -41,8 +41,8 @@ class TestEmployee(unittest.TestCase):
         # Drones paths were not updated yet, so path recalculation does not have effect.
         self.assertEqual(self.drone0.path_length, 0)
         self.assertEqual(self.drone1.path_length, 0)
-        Drone.recalculate_path_length(self.drone0)
-        Drone.recalculate_path_length(self.drone1)
+        Drone._recalculate_path_length(self.drone0)
+        Drone._recalculate_path_length(self.drone1)
         self.assertEqual(self.drone0.path_length, 0)
         self.assertEqual(self.drone1.path_length, 0)
 
