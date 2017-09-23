@@ -16,11 +16,13 @@ class Drone(object):
         self.parcels = parcels
 
 
-    def __add__(self, parcel):
-        if isinstance(parcel, Parcel):
-            self.parcels.append(parcel)
-            return self
-        return NotImplemented
+    def __add__(self, parcels):
+        if isinstance(parcels, Parcel):
+            parcels = [parcels]
+        for parcel in parcels:
+            if isinstance(parcel, Parcel):
+                self.parcels.append(parcel)
+        return self
 
 
     def __str__(self):
@@ -63,7 +65,21 @@ class Drone(object):
 
 
 if __name__ == '__main__':
-    d1 = Drone(1, 10, 20)
-    d2 = Drone(2, 13, 15)
-    print(d1)
-    print(d1.number)
+    
+    drone0 = Drone(0, 50, 10) # Empty drone
+
+    parcel1 = Parcel(1, 10, (1, 1))
+    parcel2 = Parcel(2, 5, (-20, -1))
+
+    print(drone0.parcels)
+    drone0 += [parcel1, parcel2]
+    print(drone0.parcels)
+
+
+    # self.drone0 += [Parcel(0, 50, (10, 10)), Parcel(1, 150, (0, 0))]
+    # print(self.drone0.parcels)
+    # self.assertEqual(len(self.drone0.parcels), 2)
+    # self.assertIsInstance(self.drone0.parcels[0], Parcel)
+    # self.assertIsInstance(self.drone0.parcels[1], Parcel)
+    # self.assertEqual(self.drone0.path, [])
+    # self.assertEqual(self.drone0.path_length, 0)

@@ -1,14 +1,13 @@
-"""Module provides unit tests for the whole program."""
-
+"""Drone module tests."""
 
 import unittest
 
-from Parcel import Parcel
 from Drone import Drone
+from Parcel import Parcel
 
 
-class TestEmployee(unittest.TestCase):
-    """Class provides tests for all modules (might be a good idea to split them in the future)."""
+class TestDrone(unittest.TestCase):
+    """Class provides tests for drone module functions."""
 
 
     def setUp(self):
@@ -31,6 +30,18 @@ class TestEmployee(unittest.TestCase):
         self.drone0 += Parcel(0, 50, (10, 10))
         self.assertEqual(len(self.drone0.parcels), 1)
         self.assertIsInstance(self.drone0.parcels[0], Parcel)
+        self.assertEqual(self.drone0.path, [])
+        self.assertEqual(self.drone0.path_length, 0)
+
+
+    def test___add__2(self):
+        """Check adding multiple parcels to the drone."""
+
+        self.assertEqual(self.drone0.parcels, [])
+        self.drone0 += [Parcel(0, 50, (10, 10)), Parcel(1, 150, (0, 0))]
+        self.assertEqual(len(self.drone0.parcels), 2)
+        self.assertIsInstance(self.drone0.parcels[0], Parcel)
+        self.assertIsInstance(self.drone0.parcels[1], Parcel)
         self.assertEqual(self.drone0.path, [])
         self.assertEqual(self.drone0.path_length, 0)
 

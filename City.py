@@ -43,11 +43,9 @@ class City():
         for item in items:
             if isinstance(item, Drone):
                 self.drones.append(item)
-                return self
             if isinstance(item, Parcel):
                 self.parcels.append(item)
-                return self
-        return NotImplemented
+        return self
 
 
     def __str__(self):
@@ -69,27 +67,24 @@ class City():
         return string
 
 
-    @classmethod
-    def set_wind(cls, wind):
-        """Sets class attribute wind to given value."""
+    def set_wind(self, wind):
+        """Sets wind to given value."""
 
         if isinstance(wind, tuple) and len(wind) == 2:
-            cls.wind = wind
+            self.wind = wind
         else:
             raise TypeError
 
 
-    def scramble_parcels(self):
+    def distribute(self):
         """Distributes parcels at random among drones.""" # XXX initialization procedure
 
         for drone in self.drones:
             drone.parcels = []
-
         for parcel in self.parcels:
             drone = random.choice(self.drones)
             drone += parcel
-
-        self.total_distance = self._calculate_total_distance()
+        self._calculate_total_distance()
 
 
     def try_scrambling_parcels(self):
@@ -111,12 +106,12 @@ class City():
 
         # Check results and decide whether the new solution is kept
         # TODO there is the part of simulated annealing I need to implement
-        self.total_distance = self._calculate_total_distance()
+        self._calculate_total_distance()
         self.total_distances.append(self.total_distance)
         if self.total_distance >= prev_distance:
             for drone, prev_drone in self.drones, prev_drones:
                 drone = prev_drone
-            self.total_distance = self._calculate_total_distance()
+            self._calculate_total_distance()
 
 
     def simulated_annealing(self, k, t):
@@ -139,7 +134,7 @@ class City():
 
         # Check results and decide whether the new solution is kept
         # TODO there is the part of simulated annealing I need to implement
-        self.total_distance = self._calculate_total_distance()
+        self._calculate_total_distance()
         self.total_distances.append(self.total_distance)
 
         # TODO check how does this behave
@@ -151,7 +146,7 @@ class City():
             print('Revert.')
             for drone, prev_drone in self.drones, prev_drones:
                 drone = prev_drone
-            self.total_distance = self._calculate_total_distance()
+            self._calculate_total_distance()
 
 
     def _calculate_total_distance(self):
@@ -164,20 +159,23 @@ class City():
             drone.update()
             distance += drone.path_length
 
-        return distance
+        self.total_distance = distance
 
 
     def _swap(self, x, y):
         # TODO try fixing it so that it really swaps those parcels
-        print('Showing before')
+        print('Before swap.')
         plots.show_drone_paths(self)
 
         drone1index = random.randint(0, len(self.drones)-1)
         drone2index = random.randint(0, len(self.drones)-1)
-        print(drone1index, drone2index)
+        print('Drone indeces:', drone1index, drone2index)
+        print('Drone 1 parcels:', self.drones[drone1index].parcels)
+        print('Drone 2 parcels:', self.drones[drone2index].parcels)
 
         drone1 = self.drones[drone1index]
         drone2 = self.drones[drone2index]
+        print('Comparison:', drone1, self.drones[drone1index], id(drone1), id(self.drones[drone1index]))
 
         parcel1index = random.randint(0, len(drone1.parcels)-1)
         parcel2index = random.randint(0, len(drone2.parcels)-1)
@@ -190,36 +188,47 @@ class City():
             drone.update()
         print('Showing after')
         plots.show_drone_paths(self)
+        print(self.drones[drone1index].parcels)
+        print(self.drones[drone2index].parcels)
 
 
 
 
 
 if __name__ == '__main__':
-    # TODO Create tests, check how to do this (doctest or unittest)
     from random import randint
     city = City(position=(0, 0), wind=(1, 2))
-    city += Drone(1, 40, 8)
+    city += Drone(1, 140, 8)
     city += Drone(2, 103, 15)
 
-    for i in range(25):
+    for i in range(5):
         city += Parcel(i + 1, randint(10, 40), (randint(-20, 20), randint(-20, 20)))
 
     print(city)
     print(city.total_distance)
-    city.scramble_parcels()
+    city.distribute()
     print(city)
     print(city.total_distance)
 
     plots.show_parcels(city)
     plots.show_drone_paths(city)
 
-    # TODO XXX Class City and its object city or class City as a container for data (operating on class)
     print(city.wind)
     city.set_wind((10, 20))
     print(city.wind)
-    print(City.wind)
 
     city.simulated_annealing(0.01, 1000)
 
+    print(city.total_distance)
+    print('Parcelki 0 :)', city.drones[0].parcels)
+    print('Parcelki 1 :)', city.drones[1].parcels)
+    print('Drone 0 length: ', city.drones[0].path_length)
+    print('Drone 1 length: ', city.drones[1].path_length)
     city._swap(1, 2)
+    city._calculate_total_distance()
+    print(city.total_distance)
+    print('Parcelki 0 :)', city.drones[0].parcels)
+    print('Parcelki 1 :)', city.drones[1].parcels)
+    print('Drone 0 length: ', city.drones[0].path_length)
+    print('Drone 1 length: ', city.drones[1].path_length)
+    plots.show_drone_paths(city)
