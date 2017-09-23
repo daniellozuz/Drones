@@ -1,5 +1,6 @@
 """Drone module tests."""
 
+
 import unittest
 
 from Drone import Drone
@@ -52,16 +53,20 @@ class TestDrone(unittest.TestCase):
         # Drones paths were not updated yet, so path recalculation does not have effect.
         self.assertEqual(self.drone0.path_length, 0)
         self.assertEqual(self.drone1.path_length, 0)
+
         Drone._recalculate_path_length(self.drone0)
         Drone._recalculate_path_length(self.drone1)
+
         self.assertEqual(self.drone0.path_length, 0)
         self.assertEqual(self.drone1.path_length, 0)
 
         # Drone update recalculates path and path_length
         self.assertEqual(len(self.drone0.path), 0)
         self.assertEqual(len(self.drone1.path), 0)
+
         self.drone0.update()
         self.drone1.update()
+
         self.assertEqual(len(self.drone0.path), 2)
         self.assertEqual(len(self.drone1.path), 4)
         self.assertEqual(self.drone0.path_length, 0)

@@ -1,5 +1,6 @@
 from Parcel import Parcel
 
+
 class Drone(object):
     """Provides drone implementation."""
 
@@ -65,7 +66,7 @@ class Drone(object):
 
 
 if __name__ == '__main__':
-    
+
     drone0 = Drone(0, 50, 10) # Empty drone
 
     parcel1 = Parcel(1, 10, (1, 1))
@@ -74,12 +75,3 @@ if __name__ == '__main__':
     print(drone0.parcels)
     drone0 += [parcel1, parcel2]
     print(drone0.parcels)
-
-
-    # self.drone0 += [Parcel(0, 50, (10, 10)), Parcel(1, 150, (0, 0))]
-    # print(self.drone0.parcels)
-    # self.assertEqual(len(self.drone0.parcels), 2)
-    # self.assertIsInstance(self.drone0.parcels[0], Parcel)
-    # self.assertIsInstance(self.drone0.parcels[1], Parcel)
-    # self.assertEqual(self.drone0.path, [])
-    # self.assertEqual(self.drone0.path_length, 0)

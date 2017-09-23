@@ -30,10 +30,10 @@ plots.show_parcels(city)
 plots.show_drone_paths(city)
 prev_best = city.total_distance
 
-for i in range(100):
+for i in range(1000):
     city.simulated_annealing(0.01, 1000)
     print(city.total_distance)
-    if city.total_distance != prev_best:
+    if city.total_distance < prev_best:
         plots.show_drone_paths(city)
         prev_best = city.total_distance
 

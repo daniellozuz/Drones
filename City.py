@@ -1,7 +1,7 @@
 """This class serves as a data representation of the whole system.
 
 Calling its methods enables:
-    
+
     city parameters specification - wind, base(s) position,
 
     drone and parcel creation,
@@ -16,9 +16,6 @@ from Drone import Drone
 from Parcel import Parcel
 
 import plots
-
-
-# TODO @classmethods as means of reading data from txt file and loading it into City
 
 
 class City():
@@ -96,7 +93,7 @@ class City():
         prev_distance = self.total_distance
         for drone in self.drones:
             prev_drones.append(copy.deepcopy(drone))
-        
+
         # Clear state and reassign parcels randomly.
         for drone in self.drones:
             drone.parcels = []
@@ -125,12 +122,14 @@ class City():
             prev_drones.append(copy.deepcopy(drone))
 
         # Clear state and reassign parcels randomly.
-        # TODO instead of this random shit implement a swapping function. swap(between_drones, positions)
-        for drone in self.drones:
-            drone.parcels = []
-        for parcel in self.parcels:
-            drone = random.choice(self.drones)
-            drone += parcel
+        # TODO instead of this random shit implement a swapping function. swap(between_drones, in_drone)
+        # for drone in self.drones:
+        #     drone.parcels = []
+        # for parcel in self.parcels:
+        #     drone = random.choice(self.drones)
+        #     drone += parcel
+
+        self._swap(0, 0)
 
         # Check results and decide whether the new solution is kept
         # TODO there is the part of simulated annealing I need to implement
@@ -162,34 +161,35 @@ class City():
         self.total_distance = distance
 
 
-    def _swap(self, x, y):
-        # TODO try fixing it so that it really swaps those parcels
-        print('Before swap.')
-        plots.show_drone_paths(self)
+    def _swap(self, between_drones, in_drone):
+        """Performs given amount of parcel swaps."""
+
+        #print('Before swap.')
+        # plots.show_drone_paths(self)
 
         drone1index = random.randint(0, len(self.drones)-1)
         drone2index = random.randint(0, len(self.drones)-1)
-        print('Drone indeces:', drone1index, drone2index)
-        print('Drone 1 parcels:', self.drones[drone1index].parcels)
-        print('Drone 2 parcels:', self.drones[drone2index].parcels)
+        #print('Drone indeces:', drone1index, drone2index)
+        #print('Drone 1 parcels:', self.drones[drone1index].parcels)
+        #print('Drone 2 parcels:', self.drones[drone2index].parcels)
 
         drone1 = self.drones[drone1index]
         drone2 = self.drones[drone2index]
-        print('Comparison:', drone1, self.drones[drone1index], id(drone1), id(self.drones[drone1index]))
+        # print('Comparison:', drone1, self.drones[drone1index], id(drone1), id(self.drones[drone1index]))
 
         parcel1index = random.randint(0, len(drone1.parcels)-1)
         parcel2index = random.randint(0, len(drone2.parcels)-1)
-        print(parcel1index, parcel2index)
-        print(self.drones[drone1index].parcels[parcel1index], self.drones[drone2index].parcels[parcel2index])
+        # print(parcel1index, parcel2index)
+        # print(self.drones[drone1index].parcels[parcel1index], self.drones[drone2index].parcels[parcel2index])
 
         self.drones[drone1index].parcels[parcel1index], self.drones[drone2index].parcels[parcel2index] = self.drones[drone2index].parcels[parcel2index], self.drones[drone1index].parcels[parcel1index]
-        print(self.drones[drone1index].parcels[parcel1index], self.drones[drone2index].parcels[parcel2index])
+        # print(self.drones[drone1index].parcels[parcel1index], self.drones[drone2index].parcels[parcel2index])
         for drone in self.drones:
             drone.update()
-        print('Showing after')
-        plots.show_drone_paths(self)
-        print(self.drones[drone1index].parcels)
-        print(self.drones[drone2index].parcels)
+        # print('Showing after')
+        # plots.show_drone_paths(self)
+        # print(self.drones[drone1index].parcels)
+        # print(self.drones[drone2index].parcels)
 
 
 

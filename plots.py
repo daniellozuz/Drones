@@ -1,3 +1,6 @@
+"""Module provides plotting functions, which take city as an argument."""
+
+
 import matplotlib.pyplot as plt
 
 
@@ -14,8 +17,7 @@ def show_parcels(city):
 def show_drone_paths(city):
     """Shows drones paths on a map."""
     # TODO Legend.
-    # TODO Just plot drone.path
-    #plt.ion()
+    plt.ion()
     plt.clf()
     for drone in city.drones:
         if drone.path:

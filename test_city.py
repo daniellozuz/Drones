@@ -1,5 +1,6 @@
 """City module tests."""
 
+
 import unittest
 
 from City import City
@@ -63,7 +64,7 @@ class TestCity(unittest.TestCase):
         self.city.set_wind((-6, -7))
 
         self.assertEqual(self.city.wind, (-6, -7))
-    
+
 
     def test_distribute(self):
         """Checks whether distribution assigns parcels to drones."""
@@ -75,6 +76,18 @@ class TestCity(unittest.TestCase):
         self.city.distribute()
 
         self.assertEqual((sum(len(drone.parcels) for drone in self.city.drones)), 2)
+
+
+    def test_calculate_total_distance(self):
+        """Checks total distance recalculation for a single drone with a single parcel."""
+
+        self.assertEqual(self.city.total_distance, 0)
+
+        self.city += self.drone0
+        self.city += self.parcel1
+        self.city.distribute()
+
+        self.assertEqual(self.city.total_distance, 2.8284271247461903)
 
 
 if __name__ == '__main__':
