@@ -29,6 +29,8 @@ class City():
         self.position = position
         self.wind = wind
         self.total_distance = 0
+        self.best_total_distance = math.inf
+        self.best_total_distances = []
         self.total_distances = []
         self.drones = []
         self.parcels = []
@@ -122,28 +124,34 @@ class City():
             prev_drones.append(copy.deepcopy(drone))
 
         # Clear state and reassign parcels randomly.
-        # TODO instead of this random shit implement a swapping function. swap(between_drones, in_drone)
         # for drone in self.drones:
         #     drone.parcels = []
         # for parcel in self.parcels:
         #     drone = random.choice(self.drones)
         #     drone += parcel
 
+        # Swap 2 parcels.
         self._swap(0, 0)
+
+        # Pop and insert.
+        # self._move()
 
         # Check results and decide whether the new solution is kept
         # TODO there is the part of simulated annealing I need to implement
         self._calculate_total_distance()
         self.total_distances.append(self.total_distance)
+        if self.total_distance < self.best_total_distance:
+            self.best_total_distance = self.total_distance
+        self.best_total_distances.append(self.best_total_distance)
 
         # TODO check how does this behave
-        #print('Improvement:', self.total_distance - prev_distance)
-        #print('Weird value:', (1 / (math.e ** ((self.total_distance - prev_distance) / (k * t)) + 1)))
+        # print('Improvement:', self.total_distance - prev_distance)
+        print('Weird value:', (1 / (math.e ** ((self.total_distance - prev_distance) / (k * t)) + 1)))
         if (1 / (math.e ** ((self.total_distance - prev_distance) / (k * t)) + 1) > random.random()):
             print('Passed.')
         else:
             print('Revert.')
-            for drone, prev_drone in self.drones, prev_drones:
+            for drone, prev_drone in zip(self.drones, prev_drones):
                 drone = prev_drone
             self._calculate_total_distance()
 
@@ -163,15 +171,16 @@ class City():
 
     def _swap(self, between_drones, in_drone):
         """Performs given amount of parcel swaps."""
+        # TODO make it not swap but pop and insert?
 
-        #print('Before swap.')
+        # print('Before swap.')
         # plots.show_drone_paths(self)
 
         drone1index = random.randint(0, len(self.drones)-1)
         drone2index = random.randint(0, len(self.drones)-1)
-        #print('Drone indeces:', drone1index, drone2index)
-        #print('Drone 1 parcels:', self.drones[drone1index].parcels)
-        #print('Drone 2 parcels:', self.drones[drone2index].parcels)
+        # print('Drone indeces:', drone1index, drone2index)
+        # print('Drone 1 parcels:', self.drones[drone1index].parcels)
+        # print('Drone 2 parcels:', self.drones[drone2index].parcels)
 
         drone1 = self.drones[drone1index]
         drone2 = self.drones[drone2index]
