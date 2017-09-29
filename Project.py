@@ -4,6 +4,7 @@ We instantiate a city, provide it with data, and call appropriate
 methods to manupulate data and receive results or visualization."""
 
 
+from collections import namedtuple
 from random import randint
 
 from City import City
@@ -13,16 +14,19 @@ from Parcel import Parcel
 import plots
 
 
+Position = namedtuple('Position', ['x', 'y'])
+
+
 # City creation
-city = City(position=(0, 0), wind=(1, 2))
+city = City(position=Position(0, 0), wind=(1, 2))
 
 city += Drone(1, 2400, 8)
-# city += Drone(2, 203, 15)
+city += Drone(2, 203, 15)
 # city += Drone(3, 300, 10)
 # city += Drone(4, 250, 50)
 
-for i in range(25):
-    city += Parcel(i + 1, randint(10, 40), (randint(-20, 20), randint(-20, 20)))
+for i in range(3):
+    city += Parcel(i + 1, randint(10, 40), Position(randint(-20, 20), randint(-20, 20)))
 
 
 # Computations and Visualization

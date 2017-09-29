@@ -1,3 +1,9 @@
+from collections import namedtuple
+
+
+Position = namedtuple('Position', ['x', 'y'])
+
+
 class Parcel(object):
     """Provides parcel implementation."""
 
@@ -19,7 +25,7 @@ class Parcel(object):
 
 
 if __name__ == '__main__':
-    p1 = Parcel(1, 5, (1, 1))
-    p2 = Parcel(2, 9, (3, 5))
+    p1 = Parcel(1, 5, Position(1, 1))
+    p2 = Parcel(2, 9, Position(3, 5))
     print(p1)
     print(p1.number)

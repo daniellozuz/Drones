@@ -9,6 +9,7 @@ Calling its methods enables:
     numerical computations - rearranging parcels among drones and recalculating results."""
 
 
+from collections import namedtuple
 import copy
 import math
 import random
@@ -19,11 +20,14 @@ from Parcel import Parcel
 import plots
 
 
+Position = namedtuple('Position', ['x', 'y'])
+
+
 class City():
     """Main interface with the data."""
 
 
-    def __init__(self, position=(0, 0), wind=(0, 0)):
+    def __init__(self, position=Position(0, 0), wind=(0, 0)):
         # TODO implement a way to create random data (specify number of drones and parcels to be randomly added).
         # TODO implement saving to and reading from a file (testing purposes, samples, which would be a reference to algorithm performance).
 
@@ -164,6 +168,7 @@ class City():
     def _swap(self, between_drones, in_drone):
         """Performs given amount of parcel swaps."""
         # TODO make it not swap but pop and insert?
+        # XXX errors when no parcels assigned to a drone (random function goes mad).
 
         for _ in range(between_drones):
             drone1index = random.randint(0, len(self.drones)-1)
@@ -186,12 +191,12 @@ class City():
 
 if __name__ == '__main__':
     from random import randint
-    city = City(position=(0, 0), wind=(1, 2))
+    city = City(position=Position(0, 0), wind=(1, 2))
     city += Drone(1, 140, 8)
     city += Drone(2, 103, 15)
 
     for i in range(5):
-        city += Parcel(i + 1, randint(10, 40), (randint(-20, 20), randint(-20, 20)))
+        city += Parcel(i + 1, randint(10, 40), Position(randint(-20, 20), randint(-20, 20)))
 
     print(city)
     print(city.total_distance)

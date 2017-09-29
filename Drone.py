@@ -39,7 +39,7 @@ class Drone(object):
         return string
 
 
-    def update(self, base=(0, 0)):
+    def update(self, base=Position(0, 0)):
         """Recalculates drone's parameters after modifications/alterations."""
 
         # Update drone's path
@@ -60,7 +60,7 @@ class Drone(object):
     def _recalculate_path_length(self):
         """Recalculates path length."""
 
-        dist = lambda x, y: ((x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2) ** 0.5
+        dist = lambda p1, p2: ((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2) ** 0.5
 
         self.path_length = 0
         for point1, point2 in zip(self.path[:-1], self.path[1:]):
@@ -74,8 +74,8 @@ if __name__ == '__main__':
 
     drone0 = Drone(0, 50, 10) # Empty drone
 
-    parcel1 = Parcel(1, 10, (1, 1))
-    parcel2 = Parcel(2, 5, (-20, -1))
+    parcel1 = Parcel(1, 10, Position(1, 1))
+    parcel2 = Parcel(2, 5, Position(-20, -1))
 
     print(drone0.parcels)
     drone0 += [parcel1, parcel2]

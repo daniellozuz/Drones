@@ -1,11 +1,15 @@
 """City module tests."""
 
 
+from collections import namedtuple
 import unittest
 
 from City import City
 from Drone import Drone
 from Parcel import Parcel
+
+
+Position = namedtuple('Position', ['x', 'y'])
 
 
 class TestCity(unittest.TestCase):
@@ -15,13 +19,13 @@ class TestCity(unittest.TestCase):
     def setUp(self):
         """Prepare environment for testing."""
 
-        self.city = City(position=(0, 0), wind=(1, 2))
+        self.city = City(position=Position(0, 0), wind=(1, 2))
 
         self.drone0 = Drone(0, 50, 10) # Empty drone
         self.drone1 = Drone(1, 140, 8) # Drone with parcels
 
-        self.parcel1 = Parcel(1, 10, (1, 1))
-        self.parcel2 = Parcel(2, 5, (-20, -1))
+        self.parcel1 = Parcel(1, 10, Position(1, 1))
+        self.parcel2 = Parcel(2, 5, Position(-20, -1))
 
         self.drone1 += self.parcel1
         self.drone1 += self.parcel2
