@@ -1,4 +1,9 @@
+from collections import namedtuple
+
 from Parcel import Parcel
+
+
+Position = namedtuple('Position', ['x', 'y'])
 
 
 class Drone(object):

@@ -9,6 +9,7 @@ Calling its methods enables:
     numerical computations - rearranging parcels among drones and recalculating results."""
 
 
+import copy
 import math
 import random
 
@@ -90,7 +91,6 @@ class City():
         """Performs random redistribution of parcels to drones (undone if no improvement)."""
 
         # Save previous state.
-        import copy
         prev_drones = []
         prev_distance = self.total_distance
         for drone in self.drones:
@@ -113,31 +113,22 @@ class City():
             self._calculate_total_distance()
 
 
-    def simulated_annealing(self, k, t):
+    # TODO add swapping method in parameter?
+    def simulated_annealing(self, k, temperature):
         """Performs simulated annealing algorithm."""
 
         # Save previous state.
-        import copy
         prev_drones = []
         prev_distance = self.total_distance
         for drone in self.drones:
             prev_drones.append(copy.deepcopy(drone))
 
-        # Clear state and reassign parcels randomly.
-        # for drone in self.drones:
-        #     drone.parcels = []
-        # for parcel in self.parcels:
-        #     drone = random.choice(self.drones)
-        #     drone += parcel
-
-        # Swap 2 parcels.
-        self._swap(0, 0)
+        self._swap(int(temperature), 0)
 
         # Pop and insert.
         # self._move()
 
         # Check results and decide whether the new solution is kept
-        # TODO there is the part of simulated annealing I need to implement
         self._calculate_total_distance()
         self.total_distances.append(self.total_distance)
         if self.total_distance < self.best_total_distance:
@@ -146,8 +137,9 @@ class City():
 
         # TODO check how does this behave
         # print('Improvement:', self.total_distance - prev_distance)
-        print('Weird value:', (1 / (math.e ** ((self.total_distance - prev_distance) / (k * t)) + 1)))
-        if (1 / (math.e ** ((self.total_distance - prev_distance) / (k * t)) + 1) > random.random()):
+        weird_value = math.e ** (k * (prev_distance - self.total_distance) / temperature)
+        print('Weird value:', weird_value)
+        if weird_value > random.random():
             print('Passed.')
         else:
             print('Revert.')
@@ -173,32 +165,20 @@ class City():
         """Performs given amount of parcel swaps."""
         # TODO make it not swap but pop and insert?
 
-        # print('Before swap.')
-        # plots.show_drone_paths(self)
+        for _ in range(between_drones):
+            drone1index = random.randint(0, len(self.drones)-1)
+            drone2index = random.randint(0, len(self.drones)-1)
 
-        drone1index = random.randint(0, len(self.drones)-1)
-        drone2index = random.randint(0, len(self.drones)-1)
-        # print('Drone indeces:', drone1index, drone2index)
-        # print('Drone 1 parcels:', self.drones[drone1index].parcels)
-        # print('Drone 2 parcels:', self.drones[drone2index].parcels)
+            drone1 = self.drones[drone1index]
+            drone2 = self.drones[drone2index]
 
-        drone1 = self.drones[drone1index]
-        drone2 = self.drones[drone2index]
-        # print('Comparison:', drone1, self.drones[drone1index], id(drone1), id(self.drones[drone1index]))
+            parcel1index = random.randint(0, len(drone1.parcels)-1)
+            parcel2index = random.randint(0, len(drone2.parcels)-1)
 
-        parcel1index = random.randint(0, len(drone1.parcels)-1)
-        parcel2index = random.randint(0, len(drone2.parcels)-1)
-        # print(parcel1index, parcel2index)
-        # print(self.drones[drone1index].parcels[parcel1index], self.drones[drone2index].parcels[parcel2index])
+            self.drones[drone1index].parcels[parcel1index], self.drones[drone2index].parcels[parcel2index] = self.drones[drone2index].parcels[parcel2index], self.drones[drone1index].parcels[parcel1index]
 
-        self.drones[drone1index].parcels[parcel1index], self.drones[drone2index].parcels[parcel2index] = self.drones[drone2index].parcels[parcel2index], self.drones[drone1index].parcels[parcel1index]
-        # print(self.drones[drone1index].parcels[parcel1index], self.drones[drone2index].parcels[parcel2index])
         for drone in self.drones:
             drone.update()
-        # print('Showing after')
-        # plots.show_drone_paths(self)
-        # print(self.drones[drone1index].parcels)
-        # print(self.drones[drone2index].parcels)
 
 
 
