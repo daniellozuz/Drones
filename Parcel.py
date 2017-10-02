@@ -1,7 +1,4 @@
-from collections import namedtuple
-
-
-Position = namedtuple('Position', ['x', 'y'])
+from common import Position as Pos
 
 
 class Parcel(object):
@@ -32,7 +29,7 @@ class Parcel(object):
 
 
 if __name__ == '__main__':
-    p1 = Parcel(1, 5, Position(1, 1))
-    p2 = Parcel(2, 9, Position(3, 5))
+    p1 = Parcel(1, 5, Pos(1, 1))
+    p2 = Parcel(2, 9, Pos(3, 5))
     print(p1)
     print(p1.number)

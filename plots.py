@@ -7,11 +7,10 @@ import matplotlib.pyplot as plt
 def show_parcels(city):
     """Shows parcels on a map (for now overlaps drone paths)."""
 
-    xcoord = [ele.position[0] for ele in city.parcels]
-    ycoord = [ele.position[1] for ele in city.parcels]
-
-    plt.plot(xcoord, ycoord, 'ro')
-    plt.plot(city.position[0], city.position[1], 'go')
+    x_positions = [parcel.position.x for parcel in city.parcels]
+    y_positions = [parcel.position.y for parcel in city.parcels]
+    plt.plot(x_positions, y_positions, 'ro')
+    plt.plot(city.position.x, city.position.y, 'go')
 
 
 def show_drone_paths(city):

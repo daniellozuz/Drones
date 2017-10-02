@@ -1,9 +1,5 @@
-from collections import namedtuple
-
+from common import Position as Pos
 from Parcel import Parcel
-
-
-Position = namedtuple('Position', ['x', 'y'])
 
 
 class Drone(object):
@@ -47,7 +43,7 @@ class Drone(object):
         return string
 
 
-    def update(self, base=Position(0, 0)):
+    def update(self, base=Pos(0, 0)):
         """Recalculates drone's parameters after modifications/alterations."""
 
         # Update drone's path
@@ -82,8 +78,8 @@ if __name__ == '__main__':
 
     drone0 = Drone(0, 50, 10) # Empty drone
 
-    parcel1 = Parcel(1, 10, Position(1, 1))
-    parcel2 = Parcel(2, 5, Position(-20, -1))
+    parcel1 = Parcel(1, 10, Pos(1, 1))
+    parcel2 = Parcel(2, 5, Pos(-20, -1))
 
     print(drone0.parcels)
     drone0 += [parcel1, parcel2]

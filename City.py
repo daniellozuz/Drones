@@ -9,25 +9,22 @@ Calling its methods enables:
     numerical computations - rearranging parcels among drones and recalculating results."""
 
 
-from collections import namedtuple
 import copy
 import math
 from random import choice, randint, random
 
+from common import Position as Pos
 from Drone import Drone
 from Parcel import Parcel
 
 import plots
 
 
-Position = namedtuple('Position', ['x', 'y'])
-
-
 class City():
     """Main interface with the data."""
 
 
-    def __init__(self, position=Position(0, 0), wind=(0, 0)):
+    def __init__(self, position=Pos(0, 0), wind=(0, 0)):
         # TODO implement a way to create random data (specify number of drones and parcels to be randomly added).
         # TODO implement saving to and reading from a file (testing purposes, samples, which would be a reference to algorithm performance).
 
@@ -126,15 +123,11 @@ class City():
         prev_distance = self.total_distance
         for drone in self.drones:
             prev_drones.append(copy.deepcopy(drone))
-        
-        # print('Saved drones:')
-        # print([repr(drone) for drone in prev_drones])
 
-        #self._move(int(temperature / 4))
-        self._swap_neighbour(1)
-
-        # print('New drones:')
-        # print([repr(drone) for drone in self.drones])
+        self._move(int(math.sqrt(temperature) - 3))
+        print('Moving: ', int(math.sqrt(temperature) - 3))
+        self._swap_neighbour(int(math.sqrt(math.sqrt(temperature))))
+        print('Swapping: ', int(math.sqrt(math.sqrt(temperature))))
 
         # Pop and insert.
         # self._move()
@@ -145,24 +138,17 @@ class City():
         if self.total_distance < self.best_total_distance:
             self.best_total_distance = self.total_distance
 
-        # TODO check how does this behave
-        # print('Improvement:', self.total_distance - prev_distance)
-        #weird_value = math.e ** (k * (prev_distance - self.total_distance) / temperature)
-        #print('Weird value:', weird_value)
-        if prev_distance > self.total_distance:
+        weird_value = math.e ** (k * (prev_distance - self.total_distance) / temperature)
+        print('Weird value:', weird_value)
+        if weird_value > random():
             print('Passed.')
         else:
             print('Revert.')
             for i in range(len(self.drones)):
                 self.drones[i] = prev_drones[i]
-            # The alternative below does not work. (probably zip creates a copy.)
-            # for drone, prev_drone in zip(self.drones, prev_drones):
-            #     drone = prev_drone
             self._calculate_total_distance()
-        
+
         self.best_total_distances.append(self.best_total_distance)
-        # print('Verdict drones:')
-        # print([repr(drone) for drone in self.drones])
 
 
     def _calculate_total_distance(self):
@@ -247,12 +233,12 @@ class City():
 
 if __name__ == '__main__':
     from random import randint
-    city = City(position=Position(0, 0), wind=(1, 2))
+    city = City(position=Pos(0, 0), wind=(1, 2))
     city += Drone(1, 140, 8)
     city += Drone(2, 103, 15)
 
     for i in range(5):
-        city += Parcel(i + 1, randint(10, 40), Position(randint(-20, 20), randint(-20, 20)))
+        city += Parcel(i + 1, randint(10, 40), Pos(randint(-20, 20), randint(-20, 20)))
 
     print(city)
     print(city.total_distance)

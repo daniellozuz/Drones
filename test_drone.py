@@ -1,14 +1,11 @@
 """Drone module tests."""
 
 
-from collections import namedtuple
 import unittest
 
+from common import Position as Pos
 from Drone import Drone
 from Parcel import Parcel
-
-
-Position = namedtuple('Position', ['x', 'y'])
 
 
 class TestDrone(unittest.TestCase):
@@ -21,8 +18,8 @@ class TestDrone(unittest.TestCase):
         self.drone0 = Drone(0, 50, 10) # Empty drone
         self.drone1 = Drone(1, 140, 8) # Drone with parcels
 
-        self.parcel1 = Parcel(1, 10, Position(1, 1))
-        self.parcel2 = Parcel(2, 5, Position(-20, -1))
+        self.parcel1 = Parcel(1, 10, Pos(1, 1))
+        self.parcel2 = Parcel(2, 5, Pos(-20, -1))
 
         self.drone1 += self.parcel1
         self.drone1 += self.parcel2
@@ -32,7 +29,7 @@ class TestDrone(unittest.TestCase):
         """Check adding a parcel to the drone."""
 
         self.assertEqual(self.drone0.parcels, [])
-        self.drone0 += Parcel(0, 50, Position(10, 10))
+        self.drone0 += Parcel(0, 50, Pos(10, 10))
         self.assertEqual(len(self.drone0.parcels), 1)
         self.assertIsInstance(self.drone0.parcels[0], Parcel)
         self.assertEqual(self.drone0.path, [])
@@ -43,7 +40,7 @@ class TestDrone(unittest.TestCase):
         """Check adding multiple parcels to the drone."""
 
         self.assertEqual(self.drone0.parcels, [])
-        self.drone0 += [Parcel(0, 50, Position(10, 10)), Parcel(1, 150, Position(0, 0))]
+        self.drone0 += [Parcel(0, 50, Pos(10, 10)), Parcel(1, 150, Pos(0, 0))]
         self.assertEqual(len(self.drone0.parcels), 2)
         self.assertIsInstance(self.drone0.parcels[0], Parcel)
         self.assertIsInstance(self.drone0.parcels[1], Parcel)
