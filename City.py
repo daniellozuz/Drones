@@ -12,7 +12,7 @@ Calling its methods enables:
 from collections import namedtuple
 import copy
 import math
-import random
+from random import choice, randint, random
 
 from Drone import Drone
 from Parcel import Parcel
@@ -86,7 +86,7 @@ class City():
         for drone in self.drones:
             drone.parcels = []
         for parcel in self.parcels:
-            drone = random.choice(self.drones)
+            drone = choice(self.drones)
             drone += parcel
         self._calculate_total_distance()
 
@@ -104,7 +104,7 @@ class City():
         for drone in self.drones:
             drone.parcels = []
         for parcel in self.parcels:
-            drone = random.choice(self.drones)
+            drone = choice(self.drones)
             drone += parcel
 
         # Check results and decide whether the new solution is kept
@@ -126,8 +126,15 @@ class City():
         prev_distance = self.total_distance
         for drone in self.drones:
             prev_drones.append(copy.deepcopy(drone))
+        
+        # print('Saved drones:')
+        # print([repr(drone) for drone in prev_drones])
 
-        self._swap(int(temperature), 0)
+        #self._move(int(temperature / 4))
+        self._swap_neighbour(1)
+
+        # print('New drones:')
+        # print([repr(drone) for drone in self.drones])
 
         # Pop and insert.
         # self._move()
@@ -137,19 +144,25 @@ class City():
         self.total_distances.append(self.total_distance)
         if self.total_distance < self.best_total_distance:
             self.best_total_distance = self.total_distance
-        self.best_total_distances.append(self.best_total_distance)
 
         # TODO check how does this behave
         # print('Improvement:', self.total_distance - prev_distance)
-        weird_value = math.e ** (k * (prev_distance - self.total_distance) / temperature)
-        print('Weird value:', weird_value)
-        if weird_value > random.random():
+        #weird_value = math.e ** (k * (prev_distance - self.total_distance) / temperature)
+        #print('Weird value:', weird_value)
+        if prev_distance > self.total_distance:
             print('Passed.')
         else:
             print('Revert.')
-            for drone, prev_drone in zip(self.drones, prev_drones):
-                drone = prev_drone
+            for i in range(len(self.drones)):
+                self.drones[i] = prev_drones[i]
+            # The alternative below does not work. (probably zip creates a copy.)
+            # for drone, prev_drone in zip(self.drones, prev_drones):
+            #     drone = prev_drone
             self._calculate_total_distance()
+        
+        self.best_total_distances.append(self.best_total_distance)
+        # print('Verdict drones:')
+        # print([repr(drone) for drone in self.drones])
 
 
     def _calculate_total_distance(self):
@@ -171,16 +184,59 @@ class City():
         # XXX errors when no parcels assigned to a drone (random function goes mad).
 
         for _ in range(between_drones):
-            drone1index = random.randint(0, len(self.drones)-1)
-            drone2index = random.randint(0, len(self.drones)-1)
+            drone1index = randint(0, len(self.drones)-1)
+            drone2index = randint(0, len(self.drones)-1)
 
             drone1 = self.drones[drone1index]
             drone2 = self.drones[drone2index]
 
-            parcel1index = random.randint(0, len(drone1.parcels)-1)
-            parcel2index = random.randint(0, len(drone2.parcels)-1)
+            parcel1index = randint(0, len(drone1.parcels)-1)
+            parcel2index = randint(0, len(drone2.parcels)-1)
 
             self.drones[drone1index].parcels[parcel1index], self.drones[drone2index].parcels[parcel2index] = self.drones[drone2index].parcels[parcel2index], self.drones[drone1index].parcels[parcel1index]
+
+        for drone in self.drones:
+            drone.update()
+    
+    
+    def _swap_neighbour(self, amount):
+        """Swaps two neighbouring parcels in a random drone amount number of times."""
+        # Fine part of an algorithm.
+
+        for _ in range(amount):
+            drone_index = randint(0, len(self.drones) - 1)
+
+            drone = self.drones[drone_index]
+
+            if len(drone.parcels) < 2:
+                continue
+
+            parcel_index = randint(0, len(drone.parcels) - 2)
+
+            drone.parcels[parcel_index], drone.parcels[parcel_index + 1] = drone.parcels[parcel_index + 1], drone.parcels[parcel_index]
+
+        for drone in self.drones:
+            drone.update()
+
+
+    def _move(self, amount):
+        """Moves random parcel between two random drones amount number of times."""
+        # Crude part of an algorithm.
+
+        for _ in range(amount):
+            drone_from_index = randint(0, len(self.drones) - 1)
+            drone_to_index = randint(0, len(self.drones) - 1)
+
+            drone_from = self.drones[drone_from_index]
+            drone_to = self.drones[drone_to_index]
+
+            if not drone_from.parcels:
+                continue
+
+            parcel_pop_index = randint(0, len(drone_from.parcels) - 1)
+            parcel_insert_index = randint(0, len(drone_to.parcels))
+
+            drone_to.parcels.insert(parcel_insert_index, drone_from.parcels.pop(parcel_pop_index))
 
         for drone in self.drones:
             drone.update()

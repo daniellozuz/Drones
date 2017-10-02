@@ -21,6 +21,13 @@ class Parcel(object):
         return string
 
 
+    def __repr__(self):
+        string = 'Number: {}, '.format(self.number)
+        string += 'Weight: {}, '.format(self.weight)
+        string += 'Position: {}\n'.format(str(self.position))
+        return string
+
+
 
 
 

@@ -39,6 +39,14 @@ class Drone(object):
         return string
 
 
+    def __repr__(self):
+        string = 'Number: {}, '.format(self.number)
+        string += 'Cap: {}, '.format(self.max_capacity)
+        string += 'Speed: {}, '.format(self.max_speed)
+        string += 'Parcels: {}\n'.format([repr(parcel) for parcel in self.parcels])
+        return string
+
+
     def update(self, base=Position(0, 0)):
         """Recalculates drone's parameters after modifications/alterations."""
 
