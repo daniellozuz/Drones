@@ -137,8 +137,8 @@ class City():
         for drone in self.drones:
             prev_drones.append(copy.deepcopy(drone))
 
-        self._move(int(math.sqrt(temperature) - 3))
-        print('Moving: ', int(math.sqrt(temperature) - 3))
+        self._move(int(math.sqrt(math.sqrt(temperature)) - 3))
+        print('Moving: ', int(math.sqrt(math.sqrt(temperature)) - 3))
         self._swap_neighbour(int(math.sqrt(math.sqrt(temperature))))
         print('Swapping: ', int(math.sqrt(math.sqrt(temperature))))
         # self.catch_neighbour(1)
@@ -226,38 +226,24 @@ class City():
         """Insert closest neighbour chain into path before selected position."""
 
         d1 = choice(self.drones)
+        d2 = choice(self.drones)
         p1_index = randint(0, len(d1.parcels) - 1)
+        p2_index = randint(0, len(d2.parcels) - 1)
         p1 = d1.parcels[p1_index]
-        closest_parcel = p1
-
-        closest_distance = math.inf
-
-        for drone in self.drones:
-            for parcel in drone.parcels:
-                if parcel != p1:
-                    new_dist = dist(p1.position, parcel.position)
-                    if new_dist < closest_distance:
-                        closest_parcel = parcel
-                        closest_distance = new_dist
-
-        if closest_parcel != p1:
-            for drone in self.drones:
-                for parcel_index in range(len(drone.parcels)):
-                    parcel = drone.parcels[parcel_index]
-                    if parcel == closest_parcel:
-                        chain = []
-                        direction = randint(0, 1)
-                        amount = 0
-                        while len(drone.parcels) - 1 >= parcel_index and amount <= int(len(drone.parcels) * betavariate(1, 5)):
-                            chain.append(drone.parcels[parcel_index])
-                            drone.parcels.pop(parcel_index) # continue popping in random direction
-                            parcel_index -= direction
-                            amount += 1
-                        offset = randint(0, 1)
-                        for c in chain: # or reversed chain
-                            d1.parcels.insert(p1_index + offset, c) # TODO Make it insert randomly after or before.
-                        print('Chain length:', amount)
-                        return
+        p2 = d2.parcels[p2_index]
+        chain = []
+        direction = randint(0, 1)
+        amount = 0
+        while len(d2.parcels) - 1 >= p2_index and amount <= int(len(d2.parcels) * betavariate(1, 5)): # TODO Variate runs several times - take it out of while
+            chain.append(d2.parcels[p2_index])
+            d2.parcels.pop(p2_index) # continue popping in random direction
+            p2_index -= direction
+            amount += 1
+        offset = randint(0, 1)
+        for c in chain: # or reversed chain
+            d1.parcels.insert(p1_index + offset, c) # TODO Make it insert randomly after or before.
+        print('Chain length:', amount)
+        return
 
 
     def _move(self, amount):

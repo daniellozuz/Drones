@@ -36,7 +36,7 @@ prev_best = city.total_distance
 prev = city.total_distance
 
 scale = 1
-temperature = 1000
+temperature = 100
 
 while temperature > 1:
     city.simulated_annealing(scale, temperature)
