@@ -12,7 +12,7 @@ Calling its methods enables:
 import copy
 import json
 import math
-from random import choice, randint, random
+from random import choice, randint, random, betavariate
 
 from common import Position as Pos
 from common import dist
@@ -141,7 +141,8 @@ class City():
         print('Moving: ', int(math.sqrt(temperature) - 3))
         self._swap_neighbour(int(math.sqrt(math.sqrt(temperature))))
         print('Swapping: ', int(math.sqrt(math.sqrt(temperature))))
-        self.catch_neighbour(1)
+        # self.catch_neighbour(1)
+        self.catch_neighbour_chain()
 
         self._calculate_total_distance()
         self.total_distances.append(self.total_distance)
@@ -194,7 +195,7 @@ class City():
 
 
     def catch_neighbour(self, amount):
-        """Pick a point P1, find close neighbour P2, try inserting it into your path (before & after P1)."""
+        """Insert closest neighbour into path before selected position."""
 
         d1 = choice(self.drones)
         p1_index = randint(0, len(d1.parcels) - 1)
@@ -217,7 +218,45 @@ class City():
                     parcel = drone.parcels[parcel_index]
                     if parcel == closest_parcel:
                         drone.parcels.pop(parcel_index)
-                        d1.parcels.insert(p1_index, parcel) # TODO Make it insert randomly after or before.
+                        d1.parcels.insert(p1_index + randint(0, 1), parcel) # TODO Make it insert randomly after or before.
+                        return
+
+
+    def catch_neighbour_chain(self):
+        """Insert closest neighbour chain into path before selected position."""
+
+        d1 = choice(self.drones)
+        p1_index = randint(0, len(d1.parcels) - 1)
+        p1 = d1.parcels[p1_index]
+        closest_parcel = p1
+
+        closest_distance = math.inf
+
+        for drone in self.drones:
+            for parcel in drone.parcels:
+                if parcel != p1:
+                    new_dist = dist(p1.position, parcel.position)
+                    if new_dist < closest_distance:
+                        closest_parcel = parcel
+                        closest_distance = new_dist
+
+        if closest_parcel != p1:
+            for drone in self.drones:
+                for parcel_index in range(len(drone.parcels)):
+                    parcel = drone.parcels[parcel_index]
+                    if parcel == closest_parcel:
+                        chain = []
+                        direction = randint(0, 1)
+                        amount = 0
+                        while len(drone.parcels) - 1 >= parcel_index and amount <= int(len(drone.parcels) * betavariate(1, 5)):
+                            chain.append(drone.parcels[parcel_index])
+                            drone.parcels.pop(parcel_index) # continue popping in random direction
+                            parcel_index -= direction
+                            amount += 1
+                        offset = randint(0, 1)
+                        for c in chain: # or reversed chain
+                            d1.parcels.insert(p1_index + offset, c) # TODO Make it insert randomly after or before.
+                        print('Chain length:', amount)
                         return
 
 
