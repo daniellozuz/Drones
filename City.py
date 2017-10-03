@@ -9,7 +9,7 @@ Calling its methods enables:
     numerical computations - rearranging parcels among drones and recalculating results."""
 
 
-import copy
+from copy import deepcopy
 import json
 import math
 from random import choice, randint, random, betavariate
@@ -18,7 +18,6 @@ from common import Position as Pos
 from common import dist
 from Drone import Drone
 from Parcel import Parcel
-
 import plots
 
 
@@ -130,7 +129,7 @@ class City():
     def simulated_annealing(self, scale, temperature):
         """Performs simulated annealing algorithm."""
 
-        prev_drones = [copy.deepcopy(drone) for drone in self.drones]
+        prev_drones = [deepcopy(drone) for drone in self.drones]
         prev_distance = self.total_distance
 
         self._move(int(math.sqrt(math.sqrt(temperature)) - 3))
@@ -161,29 +160,19 @@ class City():
 
     def _calculate_total_distance(self):
         """Returns total distance covered by drones."""
+
         # TODO Replace distance with time (distance tends to assign most parcels to single drone).
-
-        distance = 0
-
-        for drone in self.drones:
-            distance += drone.path_length
-
-        self.total_distance = distance
+        self.total_distance = sum(drone.path_length for drone in self.drones)
 
 
     def _swap_neighbour(self, amount):
         """Swaps two neighbouring parcels in a random drone amount number of times."""
-        # Fine part of an algorithm.
 
         for _ in range(amount):
-            drone = self.drones[randint(0, len(self.drones) - 1)]
-
-            if len(drone.parcels) < 2:
-                continue
-
-            p_index = randint(0, len(drone.parcels) - 2)
-
-            drone.parcels[p_index], drone.parcels[p_index + 1] = drone.parcels[p_index + 1], drone.parcels[p_index]
+            drone = choice(self.drones)
+            if len(drone.parcels) > 1:
+                i = randint(0, len(drone.parcels) - 2)
+                drone.parcels[i], drone.parcels[i + 1] = drone.parcels[i + 1], drone.parcels[i]
 
 
     def catch_neighbour(self):
@@ -217,36 +206,30 @@ class City():
     def catch_neighbour_chain(self):
         """Insert closest neighbour chain into path before selected position."""
 
-        d1 = choice(self.drones)
-        d2 = choice(self.drones)
-        p1_index = randint(0, len(d1.parcels) - 1)
-        p2_index = randint(0, len(d2.parcels) - 1)
-        p1 = d1.parcels[p1_index]
-        p2 = d2.parcels[p2_index]
+        drone = choice(self.drones)
+        neighbour = choice(self.drones)
+        parcel1_index = randint(0, len(drone.parcels) - 1)
+        parcel2_index = randint(0, len(neighbour.parcels) - 1)
         chain = []
         direction = randint(0, 1)
         amount = 0
-        while len(d2.parcels) - 1 >= p2_index and amount <= int(len(d2.parcels) * betavariate(1, 5)): # TODO Variate runs several times - take it out of while
-            chain.append(d2.parcels[p2_index])
-            d2.parcels.pop(p2_index)
-            p2_index -= direction
+        while len(neighbour.parcels) - 1 >= parcel2_index and amount <= int(len(neighbour.parcels) * betavariate(1, 5)):
+            chain.append(neighbour.parcels[parcel2_index])
+            neighbour.parcels.pop(parcel2_index)
+            parcel2_index -= direction
             amount += 1
         offset = randint(0, 1)
-        for c in chain: # or reversed chain
-            d1.parcels.insert(p1_index + offset, c)
+        for parcel in choice([chain, reversed(chain)]): # or reversed chain
+            drone.parcels.insert(parcel1_index + offset, parcel)
         print('Chain length:', amount)
 
 
     def _move(self, amount):
         """Moves random parcel between two random drones amount number of times."""
-        # Crude part of an algorithm.
 
         for _ in range(amount):
-            drone_from_index = randint(0, len(self.drones) - 1)
-            drone_to_index = randint(0, len(self.drones) - 1)
-
-            drone_from = self.drones[drone_from_index]
-            drone_to = self.drones[drone_to_index]
+            drone_from = choice(self.drones)
+            drone_to = choice(self.drones)
 
             if not drone_from.parcels:
                 continue

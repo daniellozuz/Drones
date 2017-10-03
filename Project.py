@@ -38,7 +38,7 @@ prev = city.total_distance
 scale = 1
 temperature = 1000
 
-while temperature > 1:
+while temperature > 0.1:
     city.simulated_annealing(scale, temperature)
     print('Now', round(city.total_distance), 'Before', round(prev), 'Best', round(prev_best), 'Temp', temperature)
     print('\n')
