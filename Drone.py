@@ -1,3 +1,6 @@
+"""Provides drone implementation."""
+
+
 from common import Position as Pos
 from common import dist
 from Parcel import Parcel
@@ -40,6 +43,7 @@ class Drone(object):
         string += 'Parcels: {}\n'.format([repr(parcel) for parcel in self.parcels])
         return string
 
+
     @property
     def path(self, base=Pos(0, 0)):
         """Returns drone's path after recalculating it."""
@@ -50,25 +54,17 @@ class Drone(object):
             occupied_capacity += parcel.weight
             if occupied_capacity > self.max_capacity:
                 path.append(base)
-                occupied_capacity = 0
+                occupied_capacity = parcel.weight
             path.append(parcel.position)
         path.append(base)
+
         return path
 
+
     @property
-    def path_length(self, base=Pos(0, 0)):
+    def path_length(self):
         """Recalculates path length."""
 
-        occupied_capacity = 0
-        path = [base]
-        for parcel in self.parcels:
-            occupied_capacity += parcel.weight
-            if occupied_capacity > self.max_capacity:
-                path.append(base)
-                occupied_capacity = 0
-            path.append(parcel.position)
-        path.append(base)
-        path_length = 0
-        for point1, point2 in zip(path[:-1], path[1:]):
-            path_length += dist(point1, point2)
-        return path_length
+        path = self.path
+
+        return sum(dist(point1, point2) for point1, point2 in zip(path[:-1], path[1:]))

@@ -25,7 +25,7 @@ city += Drone(1, 2400, 8)
 for i in range(75):
     city += Parcel(i + 1, randint(10, 40), Pos(randint(-20, 20), randint(-20, 20)))
 
-city.load("grid.txt")
+#city.load("grid.txt")
 
 # Computations and Visualization
 city.assign()

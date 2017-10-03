@@ -1,10 +1,11 @@
 """Testing purposes."""
 
 
+from random import shuffle
+
 from City import City
 from common import Position as Pos
 from Drone import Drone
-from random import randint, shuffle
 from Parcel import Parcel
 
 

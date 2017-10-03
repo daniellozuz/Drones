@@ -1,4 +1,4 @@
-from common import Position as Pos
+"""Provides parcel implementation."""
 
 
 class Parcel(object):
