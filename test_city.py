@@ -67,14 +67,14 @@ class TestCity(unittest.TestCase):
         self.assertEqual(self.city.wind, (-6, -7))
 
 
-    def test_distribute(self):
-        """Checks whether distribution assigns parcels to drones."""
+    def test_assign(self):
+        """Checks whether parcels are assigned to drones."""
 
         self.assertEqual((sum(len(drone.parcels) for drone in self.city.drones)), 0)
 
         self.city += [self.drone0, self.drone1]
         self.city += [self.parcel1, self.parcel2]
-        self.city.distribute()
+        self.city.assign()
 
         self.assertEqual((sum(len(drone.parcels) for drone in self.city.drones)), 2)
 
@@ -86,7 +86,7 @@ class TestCity(unittest.TestCase):
 
         self.city += self.drone0
         self.city += self.parcel1
-        self.city.distribute()
+        self.city.assign()
 
         self.assertEqual(self.city.total_distance, 2.8284271247461903)
 
@@ -104,7 +104,7 @@ class TestCity(unittest.TestCase):
 
         self.assertEqual(len(self.city.drones), 2)
         self.assertEqual(len(self.city.parcels), 2)
-    
+
 
     def test_store(self):
         """Checks storing data to json formatted txt file."""

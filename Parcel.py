@@ -23,13 +23,3 @@ class Parcel(object):
         string += 'Weight: {}, '.format(self.weight)
         string += 'Position: {}\n'.format(str(self.position))
         return string
-
-
-
-
-
-if __name__ == '__main__':
-    p1 = Parcel(1, 5, Pos(1, 1))
-    p2 = Parcel(2, 9, Pos(3, 5))
-    print(p1)
-    print(p1.number)

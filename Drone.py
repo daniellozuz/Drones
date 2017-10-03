@@ -69,18 +69,3 @@ class Drone(object):
         self.path_length = 0
         for point1, point2 in zip(self.path[:-1], self.path[1:]):
             self.path_length += dist(point1, point2)
-
-
-
-
-
-if __name__ == '__main__':
-
-    drone0 = Drone(0, 50, 10) # Empty drone
-
-    parcel1 = Parcel(1, 10, Pos(1, 1))
-    parcel2 = Parcel(2, 5, Pos(-20, -1))
-
-    print(drone0.parcels)
-    drone0 += [parcel1, parcel2]
-    print(drone0.parcels)

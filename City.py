@@ -27,7 +27,6 @@ class City():
 
     def __init__(self, position=Pos(0, 0), wind=(0, 0)):
         # TODO implement a way to create random data (specify number of drones and parcels to be randomly added).
-        # TODO implement saving to and reading from a file (testing purposes, samples, which would be a reference to algorithm performance).
 
         self.position = position
         self.wind = wind
@@ -83,7 +82,7 @@ class City():
             self += Parcel(parcel['number'], parcel['weight'], Pos(parcel['x'], parcel['y']))
         for drone in data['drones']:
             self += Drone(drone['number'], drone['max_capacity'], drone['max_speed'])
-    
+
 
     def store(self, json_file_name):
         """Stores data (city parameters, drones and parcels) to json .txt file."""
@@ -95,9 +94,14 @@ class City():
         data['parcels'] = []
 
         for drone in self.drones:
-            data['drones'].append({"number" : drone.number, "max_capacity" : drone.max_capacity, "max_speed" : drone.max_speed})
+            data['drones'].append({"number" : drone.number,
+                                   "max_capacity" : drone.max_capacity,
+                                   "max_speed" : drone.max_speed})
         for parcel in self.parcels:
-            data['parcels'].append({"number" : parcel.number, "weight" : parcel.weight, "x" : parcel.position.x, "y" : parcel.position.y})
+            data['parcels'].append({"number" : parcel.number,
+                                    "weight" : parcel.weight,
+                                    "x" : parcel.position.x,
+                                    "y" : parcel.position.y})
 
         with open(json_file_name, 'w') as json_file:
             json.dump(data, json_file, indent=4)
@@ -112,8 +116,8 @@ class City():
             raise TypeError
 
 
-    def distribute(self):
-        """Distributes parcels at random among drones.""" # XXX initialization procedure
+    def assign(self):
+        """Assigns parcels at random among drones.""" # XXX initialization procedure
 
         for drone in self.drones:
             drone.parcels = []
@@ -123,11 +127,9 @@ class City():
         self._calculate_total_distance()
 
 
-    # TODO add swapping method in parameter?
     def simulated_annealing(self, k, temperature):
         """Performs simulated annealing algorithm."""
 
-        # Save previous state.
         prev_drones = []
         prev_distance = self.total_distance
         for drone in self.drones:
@@ -138,10 +140,6 @@ class City():
         self._swap_neighbour(int(math.sqrt(math.sqrt(temperature))))
         print('Swapping: ', int(math.sqrt(math.sqrt(temperature))))
 
-        # Pop and insert.
-        # self._move()
-
-        # Check results and decide whether the new solution is kept
         self._calculate_total_distance()
         self.total_distances.append(self.total_distance)
         if self.total_distance < self.best_total_distance:
@@ -173,42 +171,19 @@ class City():
         self.total_distance = distance
 
 
-    def _swap(self, between_drones, in_drone):
-        """Performs given amount of parcel swaps."""
-        # TODO make it not swap but pop and insert?
-        # XXX errors when no parcels assigned to a drone (random function goes mad).
-
-        for _ in range(between_drones):
-            drone1index = randint(0, len(self.drones) - 1)
-            drone2index = randint(0, len(self.drones) - 1)
-
-            drone1 = self.drones[drone1index]
-            drone2 = self.drones[drone2index]
-
-            parcel1index = randint(0, len(drone1.parcels) - 1)
-            parcel2index = randint(0, len(drone2.parcels) - 1)
-
-            self.drones[drone1index].parcels[parcel1index], self.drones[drone2index].parcels[parcel2index] = self.drones[drone2index].parcels[parcel2index], self.drones[drone1index].parcels[parcel1index]
-
-        for drone in self.drones:
-            drone.update()
-    
-    
     def _swap_neighbour(self, amount):
         """Swaps two neighbouring parcels in a random drone amount number of times."""
         # Fine part of an algorithm.
 
         for _ in range(amount):
-            drone_index = randint(0, len(self.drones) - 1)
-
-            drone = self.drones[drone_index]
+            drone = self.drones[randint(0, len(self.drones) - 1)]
 
             if len(drone.parcels) < 2:
                 continue
 
-            parcel_index = randint(0, len(drone.parcels) - 2)
+            p_index = randint(0, len(drone.parcels) - 2)
 
-            drone.parcels[parcel_index], drone.parcels[parcel_index + 1] = drone.parcels[parcel_index + 1], drone.parcels[parcel_index]
+            drone.parcels[p_index], drone.parcels[p_index + 1] = drone.parcels[p_index + 1], drone.parcels[p_index]
 
         for drone in self.drones:
             drone.update()
@@ -251,7 +226,7 @@ if __name__ == '__main__':
 
     print(city)
     print(city.total_distance)
-    city.distribute()
+    city.assign()
     print(city)
     print(city.total_distance)
 
@@ -269,7 +244,7 @@ if __name__ == '__main__':
     print('Parcelki 1 :)', city.drones[1].parcels)
     print('Drone 0 length: ', city.drones[0].path_length)
     print('Drone 1 length: ', city.drones[1].path_length)
-    city._swap(1, 2)
+    city._swap_neighbour(1)
     city._calculate_total_distance()
     print(city.total_distance)
     print('Parcelki 0 :)', city.drones[0].parcels)

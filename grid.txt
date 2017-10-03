@@ -1,0 +1,499 @@
+{
+    "wind": [
+        1,
+        2
+    ],
+    "position": [
+        0,
+        0
+    ],
+    "drones": [
+        {
+            "number": 1,
+            "max_capacity": 24000,
+            "max_speed": 10
+        }
+    ],
+    "parcels": [
+        {
+            "number": 25,
+            "weight": 10,
+            "x": -20,
+            "y": 20
+        },
+        {
+            "number": 15,
+            "weight": 10,
+            "x": -30,
+            "y": 10
+        },
+        {
+            "number": 10,
+            "weight": 10,
+            "x": -30,
+            "y": -40
+        },
+        {
+            "number": 7,
+            "weight": 10,
+            "x": -40,
+            "y": 20
+        },
+        {
+            "number": 64,
+            "weight": 10,
+            "x": 30,
+            "y": -30
+        },
+        {
+            "number": 62,
+            "weight": 10,
+            "x": 20,
+            "y": 40
+        },
+        {
+            "number": 21,
+            "weight": 10,
+            "x": -20,
+            "y": -20
+        },
+        {
+            "number": 17,
+            "weight": 10,
+            "x": -30,
+            "y": 30
+        },
+        {
+            "number": 50,
+            "weight": 10,
+            "x": 10,
+            "y": 10
+        },
+        {
+            "number": 23,
+            "weight": 10,
+            "x": -20,
+            "y": 0
+        },
+        {
+            "number": 11,
+            "weight": 10,
+            "x": -30,
+            "y": -30
+        },
+        {
+            "number": 12,
+            "weight": 10,
+            "x": -30,
+            "y": -20
+        },
+        {
+            "number": 22,
+            "weight": 10,
+            "x": -20,
+            "y": -10
+        },
+        {
+            "number": 69,
+            "weight": 10,
+            "x": 30,
+            "y": 20
+        },
+        {
+            "number": 73,
+            "weight": 10,
+            "x": 40,
+            "y": -30
+        },
+        {
+            "number": 1,
+            "weight": 10,
+            "x": -40,
+            "y": -40
+        },
+        {
+            "number": 46,
+            "weight": 10,
+            "x": 10,
+            "y": -30
+        },
+        {
+            "number": 36,
+            "weight": 10,
+            "x": -10,
+            "y": 40
+        },
+        {
+            "number": 51,
+            "weight": 10,
+            "x": 10,
+            "y": 20
+        },
+        {
+            "number": 38,
+            "weight": 10,
+            "x": 0,
+            "y": -30
+        },
+        {
+            "number": 43,
+            "weight": 10,
+            "x": 0,
+            "y": 30
+        },
+        {
+            "number": 24,
+            "weight": 10,
+            "x": -20,
+            "y": 10
+        },
+        {
+            "number": 2,
+            "weight": 10,
+            "x": -40,
+            "y": -30
+        },
+        {
+            "number": 74,
+            "weight": 10,
+            "x": 40,
+            "y": -20
+        },
+        {
+            "number": 54,
+            "weight": 10,
+            "x": 20,
+            "y": -40
+        },
+        {
+            "number": 78,
+            "weight": 10,
+            "x": 40,
+            "y": 20
+        },
+        {
+            "number": 39,
+            "weight": 10,
+            "x": 0,
+            "y": -20
+        },
+        {
+            "number": 80,
+            "weight": 10,
+            "x": 40,
+            "y": 40
+        },
+        {
+            "number": 59,
+            "weight": 10,
+            "x": 20,
+            "y": 10
+        },
+        {
+            "number": 6,
+            "weight": 10,
+            "x": -40,
+            "y": 10
+        },
+        {
+            "number": 26,
+            "weight": 10,
+            "x": -20,
+            "y": 30
+        },
+        {
+            "number": 8,
+            "weight": 10,
+            "x": -40,
+            "y": 30
+        },
+        {
+            "number": 14,
+            "weight": 10,
+            "x": -30,
+            "y": 0
+        },
+        {
+            "number": 40,
+            "weight": 10,
+            "x": 0,
+            "y": -10
+        },
+        {
+            "number": 61,
+            "weight": 10,
+            "x": 20,
+            "y": 30
+        },
+        {
+            "number": 4,
+            "weight": 10,
+            "x": -40,
+            "y": -10
+        },
+        {
+            "number": 34,
+            "weight": 10,
+            "x": -10,
+            "y": 20
+        },
+        {
+            "number": 13,
+            "weight": 10,
+            "x": -30,
+            "y": -10
+        },
+        {
+            "number": 79,
+            "weight": 10,
+            "x": 40,
+            "y": 30
+        },
+        {
+            "number": 44,
+            "weight": 10,
+            "x": 0,
+            "y": 40
+        },
+        {
+            "number": 35,
+            "weight": 10,
+            "x": -10,
+            "y": 30
+        },
+        {
+            "number": 3,
+            "weight": 10,
+            "x": -40,
+            "y": -20
+        },
+        {
+            "number": 65,
+            "weight": 10,
+            "x": 30,
+            "y": -20
+        },
+        {
+            "number": 32,
+            "weight": 10,
+            "x": -10,
+            "y": 0
+        },
+        {
+            "number": 55,
+            "weight": 10,
+            "x": 20,
+            "y": -30
+        },
+        {
+            "number": 47,
+            "weight": 10,
+            "x": 10,
+            "y": -20
+        },
+        {
+            "number": 20,
+            "weight": 10,
+            "x": -20,
+            "y": -30
+        },
+        {
+            "number": 63,
+            "weight": 10,
+            "x": 30,
+            "y": -40
+        },
+        {
+            "number": 71,
+            "weight": 10,
+            "x": 30,
+            "y": 40
+        },
+        {
+            "number": 30,
+            "weight": 10,
+            "x": -10,
+            "y": -20
+        },
+        {
+            "number": 29,
+            "weight": 10,
+            "x": -10,
+            "y": -30
+        },
+        {
+            "number": 53,
+            "weight": 10,
+            "x": 10,
+            "y": 40
+        },
+        {
+            "number": 66,
+            "weight": 10,
+            "x": 30,
+            "y": -10
+        },
+        {
+            "number": 5,
+            "weight": 10,
+            "x": -40,
+            "y": 0
+        },
+        {
+            "number": 75,
+            "weight": 10,
+            "x": 40,
+            "y": -10
+        },
+        {
+            "number": 70,
+            "weight": 10,
+            "x": 30,
+            "y": 30
+        },
+        {
+            "number": 56,
+            "weight": 10,
+            "x": 20,
+            "y": -20
+        },
+        {
+            "number": 76,
+            "weight": 10,
+            "x": 40,
+            "y": 0
+        },
+        {
+            "number": 57,
+            "weight": 10,
+            "x": 20,
+            "y": -10
+        },
+        {
+            "number": 9,
+            "weight": 10,
+            "x": -40,
+            "y": 40
+        },
+        {
+            "number": 48,
+            "weight": 10,
+            "x": 10,
+            "y": -10
+        },
+        {
+            "number": 31,
+            "weight": 10,
+            "x": -10,
+            "y": -10
+        },
+        {
+            "number": 19,
+            "weight": 10,
+            "x": -20,
+            "y": -40
+        },
+        {
+            "number": 16,
+            "weight": 10,
+            "x": -30,
+            "y": 20
+        },
+        {
+            "number": 52,
+            "weight": 10,
+            "x": 10,
+            "y": 30
+        },
+        {
+            "number": 27,
+            "weight": 10,
+            "x": -20,
+            "y": 40
+        },
+        {
+            "number": 45,
+            "weight": 10,
+            "x": 10,
+            "y": -40
+        },
+        {
+            "number": 60,
+            "weight": 10,
+            "x": 20,
+            "y": 20
+        },
+        {
+            "number": 72,
+            "weight": 10,
+            "x": 40,
+            "y": -40
+        },
+        {
+            "number": 41,
+            "weight": 10,
+            "x": 0,
+            "y": 10
+        },
+        {
+            "number": 33,
+            "weight": 10,
+            "x": -10,
+            "y": 10
+        },
+        {
+            "number": 37,
+            "weight": 10,
+            "x": 0,
+            "y": -40
+        },
+        {
+            "number": 77,
+            "weight": 10,
+            "x": 40,
+            "y": 10
+        },
+        {
+            "number": 67,
+            "weight": 10,
+            "x": 30,
+            "y": 0
+        },
+        {
+            "number": 18,
+            "weight": 10,
+            "x": -30,
+            "y": 40
+        },
+        {
+            "number": 58,
+            "weight": 10,
+            "x": 20,
+            "y": 0
+        },
+        {
+            "number": 28,
+            "weight": 10,
+            "x": -10,
+            "y": -40
+        },
+        {
+            "number": 68,
+            "weight": 10,
+            "x": 30,
+            "y": 10
+        },
+        {
+            "number": 42,
+            "weight": 10,
+            "x": 0,
+            "y": 20
+        },
+        {
+            "number": 49,
+            "weight": 10,
+            "x": 10,
+            "y": 0
+        }
+    ]
+}
