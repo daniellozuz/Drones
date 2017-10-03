@@ -34,8 +34,8 @@ class TestDrone(unittest.TestCase):
 
         self.assertEqual(len(self.drone0.parcels), 1)
         self.assertIsInstance(self.drone0.parcels[0], Parcel)
-        self.assertEqual(self.drone0.path, [])
-        self.assertEqual(self.drone0.path_length, 0)
+        self.assertEqual(len(self.drone0.path), 3)
+        self.assertEqual(self.drone0.path_length, 28.284271247461902)
 
 
     def test___add__2(self):
@@ -43,39 +43,23 @@ class TestDrone(unittest.TestCase):
 
         self.assertEqual(self.drone0.parcels, [])
 
-        self.drone0 += [Parcel(0, 50, Pos(10, 10)), Parcel(1, 150, Pos(0, 0))]
+        self.drone0 += [Parcel(0, 5, Pos(10, 10)), Parcel(1, 15, Pos(20, 20))]
 
         self.assertEqual(len(self.drone0.parcels), 2)
         self.assertIsInstance(self.drone0.parcels[0], Parcel)
         self.assertIsInstance(self.drone0.parcels[1], Parcel)
-        self.assertEqual(self.drone0.path, [])
-        self.assertEqual(self.drone0.path_length, 0)
+        self.assertEqual(len(self.drone0.path), 4)
+        self.assertEqual(self.drone0.path_length, 56.568542494923804)
 
 
-    def test_recalculate_path_length(self):
-        """Check path and path_length recalculations before and after an update."""
+    def test_path_length(self):
+        """Check fetching path and path_length."""
 
-        # Drones paths were not updated yet, so path recalculation does not have effect.
-        self.assertEqual(self.drone0.path_length, 0)
-        self.assertEqual(self.drone1.path_length, 0)
-
-        Drone._recalculate_path_length(self.drone0)
-        Drone._recalculate_path_length(self.drone1)
-
-        self.assertEqual(self.drone0.path_length, 0)
-        self.assertEqual(self.drone1.path_length, 0)
-
-        # Drone update recalculates path and path_length
-        self.assertEqual(len(self.drone0.path), 0)
-        self.assertEqual(len(self.drone1.path), 0)
-
-        self.drone0.update()
-        self.drone1.update()
-
-        self.assertEqual(len(self.drone0.path), 2)
-        self.assertEqual(len(self.drone1.path), 4)
         self.assertEqual(self.drone0.path_length, 0)
         self.assertEqual(self.drone1.path_length, 42.53422106660287)
+        self.assertEqual(len(self.drone0.path), 2)
+        self.assertEqual(len(self.drone1.path), 4)
+
 
 
 if __name__ == '__main__':

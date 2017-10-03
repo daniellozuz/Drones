@@ -137,7 +137,7 @@ class City():
         print('Moving: ', int(math.sqrt(math.sqrt(temperature)) - 3))
         self._swap_neighbour(int(math.sqrt(math.sqrt(temperature))))
         print('Swapping: ', int(math.sqrt(math.sqrt(temperature))))
-        # self.catch_neighbour(1)
+        # self.catch_neighbour()
         self.catch_neighbour_chain()
 
         self._calculate_total_distance()
@@ -166,7 +166,6 @@ class City():
         distance = 0
 
         for drone in self.drones:
-            drone.update()
             distance += drone.path_length
 
         self.total_distance = distance
@@ -186,11 +185,8 @@ class City():
 
             drone.parcels[p_index], drone.parcels[p_index + 1] = drone.parcels[p_index + 1], drone.parcels[p_index]
 
-        for drone in self.drones:
-            drone.update()
 
-
-    def catch_neighbour(self, amount):
+    def catch_neighbour(self):
         """Insert closest neighbour into path before selected position."""
 
         d1 = choice(self.drones)
@@ -232,14 +228,13 @@ class City():
         amount = 0
         while len(d2.parcels) - 1 >= p2_index and amount <= int(len(d2.parcels) * betavariate(1, 5)): # TODO Variate runs several times - take it out of while
             chain.append(d2.parcels[p2_index])
-            d2.parcels.pop(p2_index) # continue popping in random direction
+            d2.parcels.pop(p2_index)
             p2_index -= direction
             amount += 1
         offset = randint(0, 1)
         for c in chain: # or reversed chain
-            d1.parcels.insert(p1_index + offset, c) # TODO Make it insert randomly after or before.
+            d1.parcels.insert(p1_index + offset, c)
         print('Chain length:', amount)
-        return
 
 
     def _move(self, amount):
@@ -260,9 +255,6 @@ class City():
             parcel_insert_index = randint(0, len(drone_to.parcels))
 
             drone_to.parcels.insert(parcel_insert_index, drone_from.parcels.pop(parcel_pop_index))
-
-        for drone in self.drones:
-            drone.update()
 
 
 

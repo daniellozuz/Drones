@@ -11,8 +11,6 @@ class Drone(object):
         self.number = number
         self.max_capacity = max_capacity
         self.max_speed = max_speed
-        self.path = []
-        self.path_length = 0
         if parcels is None:
             parcels = []
         self.parcels = parcels
@@ -42,28 +40,35 @@ class Drone(object):
         string += 'Parcels: {}\n'.format([repr(parcel) for parcel in self.parcels])
         return string
 
+    @property
+    def path(self, base=Pos(0, 0)):
+        """Returns drone's path after recalculating it."""
 
-    def update(self, base=Pos(0, 0)):
-        """Recalculates drone's parameters after modifications/alterations."""
-
-        # Update drone's path
         occupied_capacity = 0
-        self.path = [base]
+        path = [base]
         for parcel in self.parcels:
             occupied_capacity += parcel.weight
             if occupied_capacity > self.max_capacity:
-                self.path.append(base)
+                path.append(base)
                 occupied_capacity = 0
-            self.path.append(parcel.position)
-        self.path.append(base)
+            path.append(parcel.position)
+        path.append(base)
+        return path
 
-        # Update drone's path_length
-        self._recalculate_path_length()
-
-
-    def _recalculate_path_length(self):
+    @property
+    def path_length(self, base=Pos(0, 0)):
         """Recalculates path length."""
 
-        self.path_length = 0
-        for point1, point2 in zip(self.path[:-1], self.path[1:]):
-            self.path_length += dist(point1, point2)
+        occupied_capacity = 0
+        path = [base]
+        for parcel in self.parcels:
+            occupied_capacity += parcel.weight
+            if occupied_capacity > self.max_capacity:
+                path.append(base)
+                occupied_capacity = 0
+            path.append(parcel.position)
+        path.append(base)
+        path_length = 0
+        for point1, point2 in zip(path[:-1], path[1:]):
+            path_length += dist(point1, point2)
+        return path_length
