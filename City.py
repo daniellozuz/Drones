@@ -27,17 +27,15 @@ class City():
 
 
     def __init__(self, position=Pos(0, 0), wind=(0, 0)):
-        # TODO implement a way to create random data (specify number of drones and parcels to be randomly added).
-
         self.position = position
         self.wind = wind
-        self.total_distance = 0
-        self.best_total_distance = math.inf
-        self.current_total_distances = []
-        self.best_total_distances = []
-        self.total_distances = []
         self.drones = []
         self.parcels = []
+        self.total_distance = 0
+        self.best_total_distance = math.inf
+        self.accepted_total_distances = []
+        self.attempted_total_distances = []
+        self.best_total_distances = []
 
 
     def __add__(self, items):
@@ -132,10 +130,8 @@ class City():
     def simulated_annealing(self, scale, temperature):
         """Performs simulated annealing algorithm."""
 
-        prev_drones = []
+        prev_drones = [copy.deepcopy(drone) for drone in self.drones]
         prev_distance = self.total_distance
-        for drone in self.drones:
-            prev_drones.append(copy.deepcopy(drone))
 
         self._move(int(math.sqrt(math.sqrt(temperature)) - 3))
         print('Moving: ', int(math.sqrt(math.sqrt(temperature)) - 3))
@@ -145,7 +141,7 @@ class City():
         self.catch_neighbour_chain()
 
         self._calculate_total_distance()
-        self.total_distances.append(self.total_distance)
+        self.attempted_total_distances.append(self.total_distance)
         if self.total_distance < self.best_total_distance:
             self.best_total_distance = self.total_distance
 
@@ -160,7 +156,7 @@ class City():
             self._calculate_total_distance()
 
         self.best_total_distances.append(self.best_total_distance)
-        self.current_total_distances.append(self.total_distance)
+        self.accepted_total_distances.append(self.total_distance)
 
 
     def _calculate_total_distance(self):

@@ -13,7 +13,6 @@ class Drone(object):
         self.max_speed = max_speed
         self.path = []
         self.path_length = 0
-        # Passing [] by default does not work. Objects share parcels (because list is MUTABLE)
         if parcels is None:
             parcels = []
         self.parcels = parcels
