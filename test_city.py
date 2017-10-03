@@ -91,5 +91,20 @@ class TestCity(unittest.TestCase):
         self.assertEqual(self.city.total_distance, 2.8284271247461903)
 
 
+    def test_load(self):
+        """Checks loading data from json formatted txt file."""
+
+        self.city += self.drone0
+        self.city += self.parcel1
+
+        self.assertEqual(len(self.city.drones), 1)
+        self.assertEqual(len(self.city.parcels), 1)
+
+        self.city.load("stub.txt")
+
+        self.assertEqual(len(self.city.drones), 2)
+        self.assertEqual(len(self.city.parcels), 2)
+
+
 if __name__ == '__main__':
     unittest.main()

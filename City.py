@@ -10,6 +10,7 @@ Calling its methods enables:
 
 
 import copy
+import json
 import math
 from random import choice, randint, random
 
@@ -66,6 +67,22 @@ class City():
         for parcel in self.parcels:
             string += str(parcel)
         return string
+
+
+    def load(self, json_file_name):
+        """Loads data (city parameters, drones and parcels) from json .txt file."""
+
+        with open(json_file_name) as json_file:
+            data = json.load(json_file)
+
+        self.wind = tuple(data['wind'])
+        self.position = Pos(data['position'][0], data['position'][1])
+        self.parcels = []
+        self.drones = []
+        for parcel in data['parcels']:
+            self += Parcel(parcel['number'], parcel['weight'], Pos(parcel['x'], parcel['y']))
+        for drone in data['drones']:
+            self += Drone(drone['number'], drone['max_capacity'], drone['max_speed'])
 
 
     def set_wind(self, wind):
@@ -170,14 +187,14 @@ class City():
         # XXX errors when no parcels assigned to a drone (random function goes mad).
 
         for _ in range(between_drones):
-            drone1index = randint(0, len(self.drones)-1)
-            drone2index = randint(0, len(self.drones)-1)
+            drone1index = randint(0, len(self.drones) - 1)
+            drone2index = randint(0, len(self.drones) - 1)
 
             drone1 = self.drones[drone1index]
             drone2 = self.drones[drone2index]
 
-            parcel1index = randint(0, len(drone1.parcels)-1)
-            parcel2index = randint(0, len(drone2.parcels)-1)
+            parcel1index = randint(0, len(drone1.parcels) - 1)
+            parcel2index = randint(0, len(drone2.parcels) - 1)
 
             self.drones[drone1index].parcels[parcel1index], self.drones[drone2index].parcels[parcel2index] = self.drones[drone2index].parcels[parcel2index], self.drones[drone1index].parcels[parcel1index]
 
@@ -232,7 +249,7 @@ class City():
 
 
 if __name__ == '__main__':
-    from random import randint
+
     city = City(position=Pos(0, 0), wind=(1, 2))
     city += Drone(1, 140, 8)
     city += Drone(2, 103, 15)

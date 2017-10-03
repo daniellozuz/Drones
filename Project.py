@@ -25,6 +25,7 @@ city += Drone(1, 2400, 8)
 for i in range(75):
     city += Parcel(i + 1, randint(10, 40), Pos(randint(-20, 20), randint(-20, 20)))
 
+#city.load("stub.txt")
 
 # Computations and Visualization
 city.distribute()
@@ -41,7 +42,7 @@ while temperature > 1:
     city.simulated_annealing(k, temperature)
     print('Now', round(city.total_distance), 'Before', round(prev), 'Best', round(prev_best), 'Temp', temperature)
     print('\n')
-    temperature *= 0.9997
+    temperature *= 0.997
     prev = city.total_distance
     if city.total_distance < prev_best:
         plots.show_drone_paths(city)

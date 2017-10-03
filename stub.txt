@@ -1,0 +1,30 @@
+{
+	"position" : [0, 0],
+	"wind" : [0, 0],
+	"drones" : [
+		{
+			"number" : 1,
+			"max_capacity" : 1,
+			"max_speed" : 1
+		},
+		{
+			"number" : 2,
+			"max_capacity" : 3,
+			"max_speed" : 10
+		}
+	],
+	"parcels" : [
+		{
+			"number" : 1,
+			"weight" : 10,
+			"x" : 11,
+			"y" : 17
+		},
+		{
+			"number" : 2,
+			"weight" : 20,
+			"x" : 7,
+			"y" : 3
+		}
+	]
+}
