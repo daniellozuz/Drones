@@ -1,0 +1,49 @@
+{
+    "wind": [
+        1,
+        2
+    ],
+    "position": [
+        0,
+        0
+    ],
+    "drones": [
+        {
+            "number": 1,
+            "max_capacity": 2400,
+            "max_speed": 8
+        }
+    ],
+    "parcels": [
+        {
+            "number": 1,
+            "weight": 27,
+            "x": -14,
+            "y": -7
+        },
+        {
+            "number": 2,
+            "weight": 18,
+            "x": 12,
+            "y": 7
+        },
+        {
+            "number": 3,
+            "weight": 32,
+            "x": 12,
+            "y": 4
+        },
+        {
+            "number": 4,
+            "weight": 13,
+            "x": -1,
+            "y": 2
+        },
+        {
+            "number": 5,
+            "weight": 23,
+            "x": 3,
+            "y": -3
+        }
+    ]
+}

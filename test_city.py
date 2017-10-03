@@ -104,6 +104,26 @@ class TestCity(unittest.TestCase):
 
         self.assertEqual(len(self.city.drones), 2)
         self.assertEqual(len(self.city.parcels), 2)
+    
+
+    def test_store(self):
+        """Checks storing data to json formatted txt file."""
+
+        self.city.load("stub.txt")
+        self.city.store("stub2.txt")
+        self.city.drones = []
+        self.city.parcels = []
+
+        self.assertEqual(len(self.city.drones), 0)
+        self.assertEqual(len(self.city.parcels), 0)
+
+        self.city.load("stub2.txt")
+
+        self.assertEqual(len(self.city.drones), 2)
+        self.assertEqual(len(self.city.parcels), 2)
+
+
+
 
 
 if __name__ == '__main__':

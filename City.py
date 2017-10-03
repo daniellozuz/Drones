@@ -83,6 +83,24 @@ class City():
             self += Parcel(parcel['number'], parcel['weight'], Pos(parcel['x'], parcel['y']))
         for drone in data['drones']:
             self += Drone(drone['number'], drone['max_capacity'], drone['max_speed'])
+    
+
+    def store(self, json_file_name):
+        """Stores data (city parameters, drones and parcels) to json .txt file."""
+
+        data = {}
+        data['wind'] = list(self.wind)
+        data['position'] = [self.position.x, self.position.y]
+        data['drones'] = []
+        data['parcels'] = []
+
+        for drone in self.drones:
+            data['drones'].append({"number" : drone.number, "max_capacity" : drone.max_capacity, "max_speed" : drone.max_speed})
+        for parcel in self.parcels:
+            data['parcels'].append({"number" : parcel.number, "weight" : parcel.weight, "x" : parcel.position.x, "y" : parcel.position.y})
+
+        with open(json_file_name, 'w') as json_file:
+            json.dump(data, json_file, indent=4)
 
 
     def set_wind(self, wind):
@@ -103,32 +121,6 @@ class City():
             drone = choice(self.drones)
             drone += parcel
         self._calculate_total_distance()
-
-
-    def try_scrambling_parcels(self):
-        """Performs random redistribution of parcels to drones (undone if no improvement)."""
-
-        # Save previous state.
-        prev_drones = []
-        prev_distance = self.total_distance
-        for drone in self.drones:
-            prev_drones.append(copy.deepcopy(drone))
-
-        # Clear state and reassign parcels randomly.
-        for drone in self.drones:
-            drone.parcels = []
-        for parcel in self.parcels:
-            drone = choice(self.drones)
-            drone += parcel
-
-        # Check results and decide whether the new solution is kept
-        # TODO there is the part of simulated annealing I need to implement
-        self._calculate_total_distance()
-        self.total_distances.append(self.total_distance)
-        if self.total_distance >= prev_distance:
-            for drone, prev_drone in self.drones, prev_drones:
-                drone = prev_drone
-            self._calculate_total_distance()
 
 
     # TODO add swapping method in parameter?
