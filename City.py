@@ -15,6 +15,7 @@ import math
 from random import choice, randint, random
 
 from common import Position as Pos
+from common import dist
 from Drone import Drone
 from Parcel import Parcel
 
@@ -32,6 +33,7 @@ class City():
         self.wind = wind
         self.total_distance = 0
         self.best_total_distance = math.inf
+        self.current_total_distances = []
         self.best_total_distances = []
         self.total_distances = []
         self.drones = []
@@ -127,7 +129,7 @@ class City():
         self._calculate_total_distance()
 
 
-    def simulated_annealing(self, k, temperature):
+    def simulated_annealing(self, scale, temperature):
         """Performs simulated annealing algorithm."""
 
         prev_drones = []
@@ -139,13 +141,14 @@ class City():
         print('Moving: ', int(math.sqrt(temperature) - 3))
         self._swap_neighbour(int(math.sqrt(math.sqrt(temperature))))
         print('Swapping: ', int(math.sqrt(math.sqrt(temperature))))
+        self.catch_neighbour(1)
 
         self._calculate_total_distance()
         self.total_distances.append(self.total_distance)
         if self.total_distance < self.best_total_distance:
             self.best_total_distance = self.total_distance
 
-        weird_value = math.e ** (k * (prev_distance - self.total_distance) / temperature)
+        weird_value = math.e ** (scale * (prev_distance - self.total_distance) / temperature)
         print('Weird value:', weird_value)
         if weird_value > random():
             print('Passed.')
@@ -156,6 +159,7 @@ class City():
             self._calculate_total_distance()
 
         self.best_total_distances.append(self.best_total_distance)
+        self.current_total_distances.append(self.total_distance)
 
 
     def _calculate_total_distance(self):
@@ -187,6 +191,34 @@ class City():
 
         for drone in self.drones:
             drone.update()
+
+
+    def catch_neighbour(self, amount):
+        """Pick a point P1, find close neighbour P2, try inserting it into your path (before & after P1)."""
+
+        d1 = choice(self.drones)
+        p1_index = randint(0, len(d1.parcels) - 1)
+        p1 = d1.parcels[p1_index]
+        closest_parcel = p1
+
+        closest_distance = math.inf
+
+        for drone in self.drones:
+            for parcel in drone.parcels:
+                if parcel != p1:
+                    new_dist = dist(p1.position, parcel.position)
+                    if new_dist < closest_distance:
+                        closest_parcel = parcel
+                        closest_distance = new_dist
+
+        if closest_parcel != p1:
+            for drone in self.drones:
+                for parcel_index in range(len(drone.parcels)):
+                    parcel = drone.parcels[parcel_index]
+                    if parcel == closest_parcel:
+                        drone.parcels.pop(parcel_index)
+                        d1.parcels.insert(p1_index, parcel) # TODO Make it insert randomly after or before.
+                        return
 
 
     def _move(self, amount):

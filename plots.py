@@ -35,5 +35,6 @@ def show_distance_history(city):
     plt.ioff()
     plt.clf()
     plt.plot(range(len(city.total_distances)), city.total_distances)
+    plt.plot(range(len(city.current_total_distances)), city.current_total_distances)
     plt.plot(range(len(city.total_distances)), city.best_total_distances, 'g')
     plt.show()

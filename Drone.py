@@ -1,4 +1,5 @@
 from common import Position as Pos
+from common import dist
 from Parcel import Parcel
 
 
@@ -63,8 +64,6 @@ class Drone(object):
 
     def _recalculate_path_length(self):
         """Recalculates path length."""
-
-        dist = lambda p1, p2: ((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2) ** 0.5
 
         self.path_length = 0
         for point1, point2 in zip(self.path[:-1], self.path[1:]):
