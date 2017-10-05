@@ -97,13 +97,19 @@ class TestCity(unittest.TestCase):
         self.city += self.drone0
         self.city += self.parcel1
 
-        self.assertEqual(len(self.city.drones), 1)
-        self.assertEqual(len(self.city.parcels), 1)
+        self.assertEqual(self.city.drones, [self.drone0])
+        self.assertEqual(self.city.parcels, [self.parcel1])
 
         self.city.load("stub.txt")
 
         self.assertEqual(len(self.city.drones), 2)
+        self.assertIsInstance(self.city.drones[0], Drone)
+        self.assertIsInstance(self.city.drones[1], Drone)
         self.assertEqual(len(self.city.parcels), 2)
+        self.assertIsInstance(self.city.parcels[0], Parcel)
+        self.assertIsInstance(self.city.parcels[1], Parcel)
+ 
+
 
 
     def test_store(self):
@@ -114,13 +120,15 @@ class TestCity(unittest.TestCase):
         self.city.drones = []
         self.city.parcels = []
 
-        self.assertEqual(len(self.city.drones), 0)
-        self.assertEqual(len(self.city.parcels), 0)
+        self.assertEqual(self.city.drones, [])
+        self.assertEqual(self.city.parcels, [])
 
         self.city.load("stub2.txt")
 
         self.assertEqual(len(self.city.drones), 2)
         self.assertEqual(len(self.city.parcels), 2)
+        self.assertIsInstance(self.city.parcels[0], Parcel)
+        self.assertIsInstance(self.city.parcels[1], Parcel)
 
 
 

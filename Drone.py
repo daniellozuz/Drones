@@ -57,7 +57,6 @@ class Drone(object):
                 occupied_capacity = parcel.weight
             path.append(parcel.position)
         path.append(base)
-
         return path
 
 
@@ -66,5 +65,4 @@ class Drone(object):
         """Recalculates path length."""
 
         path = self.path
-
         return sum(dist(point1, point2) for point1, point2 in zip(path[:-1], path[1:]))

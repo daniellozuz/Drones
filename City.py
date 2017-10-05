@@ -219,7 +219,7 @@ class City():
             parcel2_index -= direction
             amount += 1
         offset = randint(0, 1)
-        for parcel in choice([chain, reversed(chain)]): # or reversed chain
+        for parcel in choice([chain, reversed(chain)]):
             drone.parcels.insert(parcel1_index + offset, parcel)
         print('Chain length:', amount)
 
