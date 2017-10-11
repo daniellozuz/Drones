@@ -108,8 +108,6 @@ class TestCity(unittest.TestCase):
         self.assertEqual(len(self.city.parcels), 2)
         self.assertIsInstance(self.city.parcels[0], Parcel)
         self.assertIsInstance(self.city.parcels[1], Parcel)
- 
-
 
 
     def test_store(self):

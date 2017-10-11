@@ -1,7 +1,9 @@
 """This module defines program behaviour.
 
-We instantiate a city, provide it with data, and call appropriate
-methods to manupulate data and receive results or visualization."""
+    A programmer is supposed to provide optimization parameters,
+    instantiate a city, provide it with data, and call appropriate
+    methods to manupulate data and receive results and visualization.
+"""
 
 
 from random import randint

@@ -1,18 +1,15 @@
 """This class serves as a data representation of the whole system.
 
-Calling its methods enables:
-
-    city parameters specification - wind, base(s) position,
-
-    drone and parcel creation,
-
-    numerical computations - rearranging parcels among drones and recalculating results."""
+    Calling its methods enables:
+        - city parameters specification - wind, base(s) position,
+        - drone and parcel creation,
+        - numerical computations - rearranging parcels among drones and recalculating results."""
 
 
 from copy import deepcopy
 import json
 import math
-from random import choice, randint, random, betavariate
+from random import choice, randint, random, randrange, betavariate
 
 from common import Position as Pos
 from common import dist
@@ -116,7 +113,7 @@ class City():
         for parcel in self.parcels:
             drone = choice(self.drones)
             drone += parcel
-        self._calculate_total_distance()
+        self.calculate_total_distance()
 
 
     def simulated_annealing(self, scale, temperature):
@@ -125,11 +122,11 @@ class City():
         prev_distance = self.total_distance
         self.randomly_move_parcels(int(math.sqrt(math.sqrt(temperature)) - 3))
         print('Moving: ', int(math.sqrt(math.sqrt(temperature)) - 3))
-        self._swap_neighbour(int(math.sqrt(math.sqrt(temperature))))
+        self.swap_neighbour(int(math.sqrt(math.sqrt(temperature))))
         print('Swapping: ', int(math.sqrt(math.sqrt(temperature))))
-        # self.catch_neighbour()
+        # self.swallow_neighbour()
         self.catch_neighbour_chain()
-        self._calculate_total_distance()
+        self.calculate_total_distance()
         self.attempted_total_distances.append(self.total_distance)
         if self.total_distance < self.best_total_distance:
             self.best_total_distance = self.total_distance
@@ -141,56 +138,60 @@ class City():
             print('Revert.')
             for i in range(len(self.drones)):
                 self.drones[i] = prev_drones[i]
-            self._calculate_total_distance()
+            self.calculate_total_distance()
         self.best_total_distances.append(self.best_total_distance)
         self.accepted_total_distances.append(self.total_distance)
 
 
-    def _calculate_total_distance(self):
+    def calculate_total_distance(self):
         """Returns total distance covered by drones."""
         # TODO Replace distance with time (distance tends to assign most parcels to single drone).
         self.total_distance = sum(drone.path_length for drone in self.drones)
 
 
-    def _swap_neighbour(self, amount):
+    def swap_neighbour(self, amount):
         """Swaps two neighbouring parcels in a random drone amount number of times."""
         for _ in range(amount):
             drone = choice(self.drones)
             if len(drone.parcels) > 1:
-                i = randint(0, len(drone.parcels) - 2)
+                i = randrange(0, len(drone.parcels) - 1)
                 drone.parcels[i], drone.parcels[i + 1] = drone.parcels[i + 1], drone.parcels[i]
 
 
-    def catch_neighbour(self):
-        """Insert closest neighbour into path before or after selected position."""
-        d1 = choice(self.drones)
-        p1_index = randint(0, len(d1.parcels) - 1)
-        p1 = d1.parcels[p1_index]
-        closest_parcel = p1
+    def swallow_neighbour(self):
+        """Insert closest neighbour into path before or after selected parcel."""
+        to_drone = choice(self.drones)
+        selected_parcel_index = randrange(0, len(to_drone.parcels))
+        selected_parcel = to_drone.parcels[selected_parcel_index]
+        closest_parcel = self.get_closest_neighbour(selected_parcel)
+        for drone in self.drones:
+            for parcel_index, parcel in enumerate(drone.parcels):
+                if parcel == closest_parcel:
+                    drone.parcels.pop(parcel_index)
+                    to_drone.parcels.insert(selected_parcel_index + randint(0, 1), parcel)
+                    return
+
+
+    def get_closest_neighbour(self, selected_parcel):
+        """Returns a closest neighbour of selected_parcel."""
         closest_distance = math.inf
         for drone in self.drones:
             for parcel in drone.parcels:
-                if parcel != p1:
-                    new_dist = dist(p1.position, parcel.position)
+                if parcel != selected_parcel:
+                    new_dist = dist(selected_parcel.position, parcel.position)
                     if new_dist < closest_distance:
                         closest_parcel = parcel
                         closest_distance = new_dist
-        if closest_parcel != p1:
-            for drone in self.drones:
-                for parcel_index in range(len(drone.parcels)):
-                    parcel = drone.parcels[parcel_index]
-                    if parcel == closest_parcel:
-                        drone.parcels.pop(parcel_index)
-                        d1.parcels.insert(p1_index + randint(0, 1), parcel) # TODO Make it insert randomly after or before.
-                        return
+        return closest_parcel
+
 
 
     def catch_neighbour_chain(self):
         """Insert closest neighbour chain into path before selected position."""
         drone = choice(self.drones)
         neighbour = choice(self.drones)
-        parcel1_index = randint(0, len(drone.parcels) - 1)
-        parcel2_index = randint(0, len(neighbour.parcels) - 1)
+        parcel1_index = randrange(0, len(drone.parcels))
+        parcel2_index = randrange(0, len(neighbour.parcels))
         chain = []
         direction = randint(0, 1)
         amount = 0
@@ -212,7 +213,7 @@ class City():
             if not from_drone.parcels:
                 continue
             to_drone = choice(self.drones)
-            pop_index = randint(0, len(from_drone.parcels) - 1)
+            pop_index = randrange(0, len(from_drone.parcels))
             insert_index = randint(0, len(to_drone.parcels))
             to_drone.parcels.insert(insert_index, from_drone.parcels.pop(pop_index))
 
@@ -249,8 +250,8 @@ if __name__ == '__main__':
     print('Parcelki 1 :)', city.drones[1].parcels)
     print('Drone 0 length: ', city.drones[0].path_length)
     print('Drone 1 length: ', city.drones[1].path_length)
-    city._swap_neighbour(1)
-    city._calculate_total_distance()
+    city.swap_neighbour(1)
+    city.calculate_total_distance()
     print(city.total_distance)
     print('Parcelki 0 :)', city.drones[0].parcels)
     print('Parcelki 1 :)', city.drones[1].parcels)
