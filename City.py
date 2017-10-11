@@ -107,7 +107,7 @@ class City():
 
 
     def assign(self):
-        """Assigns parcels at random among drones.""" # XXX initialization procedure
+        """Assigns parcels at random among drones.""" # XXX make it initialization procedure
         for drone in self.drones:
             drone.parcels = []
         for parcel in self.parcels:
@@ -117,27 +117,28 @@ class City():
 
 
     def simulated_annealing(self, scale, temperature):
-        """Performs simulated annealing algorithm."""
-        prev_drones = [deepcopy(drone) for drone in self.drones]
-        prev_distance = self.total_distance
+        """Performs one iteration of simulated annealing algorithm."""
+        # TODO needs major refactoring.
+        previous_drones = [deepcopy(drone) for drone in self.drones]
+        previous_distance = self.total_distance
         self.randomly_move_parcels(int(math.sqrt(math.sqrt(temperature)) - 3))
         print('Moving: ', int(math.sqrt(math.sqrt(temperature)) - 3))
-        self.swap_neighbour(int(math.sqrt(math.sqrt(temperature))))
+        self.swap_two_adjacent(int(math.sqrt(math.sqrt(temperature))))
         print('Swapping: ', int(math.sqrt(math.sqrt(temperature))))
-        # self.swallow_neighbour()
+        self.swallow_neighbour()
         self.catch_neighbour_chain()
         self.calculate_total_distance()
         self.attempted_total_distances.append(self.total_distance)
         if self.total_distance < self.best_total_distance:
             self.best_total_distance = self.total_distance
-        weird_value = math.e ** (scale * (prev_distance - self.total_distance) / temperature)
+        weird_value = math.e ** (scale * (previous_distance - self.total_distance) / temperature)
         print('Weird value:', weird_value)
         if weird_value > random():
             print('Passed.')
         else:
             print('Revert.')
             for i in range(len(self.drones)):
-                self.drones[i] = prev_drones[i]
+                self.drones[i] = previous_drones[i]
             self.calculate_total_distance()
         self.best_total_distances.append(self.best_total_distance)
         self.accepted_total_distances.append(self.total_distance)
@@ -149,8 +150,8 @@ class City():
         self.total_distance = sum(drone.path_length for drone in self.drones)
 
 
-    def swap_neighbour(self, amount):
-        """Swaps two neighbouring parcels in a random drone amount number of times."""
+    def swap_two_adjacent(self, amount):
+        """Swaps two adjacent parcels in a random drone's path amount number of times."""
         for _ in range(amount):
             drone = choice(self.drones)
             if len(drone.parcels) > 1:
@@ -176,30 +177,31 @@ class City():
                 if neighbour != selected_parcel:
                     new_dist = dist(selected_parcel.position, neighbour.position)
                     if new_dist < closest_distance:
-                        closest_parcel = neighbour
                         closest_distance = new_dist
-                        from_drone = drone
+                        closest_parcel, from_drone = neighbour, drone
         return closest_parcel, from_drone
-
 
 
     def catch_neighbour_chain(self):
         """Insert closest neighbour chain into path before selected position."""
-        drone = choice(self.drones)
+        # TODO needs major refactoring.
+        selected_drone = choice(self.drones)
         neighbour = choice(self.drones)
-        parcel1_index = randrange(0, len(drone.parcels))
-        parcel2_index = randrange(0, len(neighbour.parcels))
-        chain = []
+        if not neighbour.parcels or not selected_drone.parcels:
+            return
+        selected_drone_parcel_index = randrange(0, len(selected_drone.parcels))
+        neighbour_parcel_index = randrange(0, len(neighbour.parcels))
+        parcel_chain = []
         direction = randint(0, 1)
         amount = 0
-        while len(neighbour.parcels) - 1 >= parcel2_index and amount <= int(len(neighbour.parcels) * betavariate(1, 5)):
-            chain.append(neighbour.parcels[parcel2_index])
-            neighbour.parcels.pop(parcel2_index)
-            parcel2_index -= direction
+        while len(neighbour.parcels) - 1 >= neighbour_parcel_index and amount <= int(len(neighbour.parcels) * betavariate(1, 5)):
+            parcel_chain.append(neighbour.parcels[neighbour_parcel_index])
+            neighbour.parcels.pop(neighbour_parcel_index)
+            neighbour_parcel_index -= direction
             amount += 1
         offset = randint(0, 1)
-        for parcel in choice([chain, reversed(chain)]):
-            drone.parcels.insert(parcel1_index + offset, parcel)
+        for parcel in choice([parcel_chain, reversed(parcel_chain)]):
+            selected_drone.parcels.insert(selected_drone_parcel_index + offset, parcel)
         print('Chain length:', amount)
 
 
@@ -247,7 +249,7 @@ if __name__ == '__main__':
     print('Parcelki 1 :)', city.drones[1].parcels)
     print('Drone 0 length: ', city.drones[0].path_length)
     print('Drone 1 length: ', city.drones[1].path_length)
-    city.swap_neighbour(1)
+    city.swap_two_adjacent(1)
     city.calculate_total_distance()
     print(city.total_distance)
     print('Parcelki 0 :)', city.drones[0].parcels)
