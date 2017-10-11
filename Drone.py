@@ -46,8 +46,7 @@ class Drone(object):
 
     @property
     def path(self, base=Pos(0, 0)):
-        """Returns drone's path after recalculating it."""
-
+        """Get recalculated drone's path."""
         occupied_capacity = 0
         path = [base]
         for parcel in self.parcels:
@@ -62,7 +61,6 @@ class Drone(object):
 
     @property
     def path_length(self):
-        """Recalculates path length."""
-
+        """Get recalculated path length."""
         path = self.path
         return sum(dist(point1, point2) for point1, point2 in zip(path[:-1], path[1:]))

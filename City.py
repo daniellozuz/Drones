@@ -69,10 +69,8 @@ class City():
 
     def load(self, json_file_name):
         """Loads data (city parameters, drones and parcels) from json .txt file."""
-
         with open(json_file_name) as json_file:
             data = json.load(json_file)
-
         self.wind = tuple(data['wind'])
         self.position = Pos(data['position'][0], data['position'][1])
         self.parcels = []
@@ -85,13 +83,11 @@ class City():
 
     def store(self, json_file_name):
         """Stores data (city parameters, drones and parcels) to json .txt file."""
-
         data = {}
         data['wind'] = list(self.wind)
         data['position'] = [self.position.x, self.position.y]
         data['drones'] = []
         data['parcels'] = []
-
         for drone in self.drones:
             data['drones'].append({"number" : drone.number,
                                    "max_capacity" : drone.max_capacity,
@@ -101,14 +97,12 @@ class City():
                                     "weight" : parcel.weight,
                                     "x" : parcel.position.x,
                                     "y" : parcel.position.y})
-
         with open(json_file_name, 'w') as json_file:
             json.dump(data, json_file, indent=4)
 
 
     def set_wind(self, wind):
         """Sets wind to given value."""
-
         if isinstance(wind, tuple) and len(wind) == 2:
             self.wind = wind
         else:
@@ -117,7 +111,6 @@ class City():
 
     def assign(self):
         """Assigns parcels at random among drones.""" # XXX initialization procedure
-
         for drone in self.drones:
             drone.parcels = []
         for parcel in self.parcels:
@@ -128,22 +121,18 @@ class City():
 
     def simulated_annealing(self, scale, temperature):
         """Performs simulated annealing algorithm."""
-
         prev_drones = [deepcopy(drone) for drone in self.drones]
         prev_distance = self.total_distance
-
-        self._move(int(math.sqrt(math.sqrt(temperature)) - 3))
+        self.randomly_move_parcels(int(math.sqrt(math.sqrt(temperature)) - 3))
         print('Moving: ', int(math.sqrt(math.sqrt(temperature)) - 3))
         self._swap_neighbour(int(math.sqrt(math.sqrt(temperature))))
         print('Swapping: ', int(math.sqrt(math.sqrt(temperature))))
         # self.catch_neighbour()
         self.catch_neighbour_chain()
-
         self._calculate_total_distance()
         self.attempted_total_distances.append(self.total_distance)
         if self.total_distance < self.best_total_distance:
             self.best_total_distance = self.total_distance
-
         weird_value = math.e ** (scale * (prev_distance - self.total_distance) / temperature)
         print('Weird value:', weird_value)
         if weird_value > random():
@@ -153,21 +142,18 @@ class City():
             for i in range(len(self.drones)):
                 self.drones[i] = prev_drones[i]
             self._calculate_total_distance()
-
         self.best_total_distances.append(self.best_total_distance)
         self.accepted_total_distances.append(self.total_distance)
 
 
     def _calculate_total_distance(self):
         """Returns total distance covered by drones."""
-
         # TODO Replace distance with time (distance tends to assign most parcels to single drone).
         self.total_distance = sum(drone.path_length for drone in self.drones)
 
 
     def _swap_neighbour(self, amount):
         """Swaps two neighbouring parcels in a random drone amount number of times."""
-
         for _ in range(amount):
             drone = choice(self.drones)
             if len(drone.parcels) > 1:
@@ -176,15 +162,12 @@ class City():
 
 
     def catch_neighbour(self):
-        """Insert closest neighbour into path before selected position."""
-
+        """Insert closest neighbour into path before or after selected position."""
         d1 = choice(self.drones)
         p1_index = randint(0, len(d1.parcels) - 1)
         p1 = d1.parcels[p1_index]
         closest_parcel = p1
-
         closest_distance = math.inf
-
         for drone in self.drones:
             for parcel in drone.parcels:
                 if parcel != p1:
@@ -192,7 +175,6 @@ class City():
                     if new_dist < closest_distance:
                         closest_parcel = parcel
                         closest_distance = new_dist
-
         if closest_parcel != p1:
             for drone in self.drones:
                 for parcel_index in range(len(drone.parcels)):
@@ -205,7 +187,6 @@ class City():
 
     def catch_neighbour_chain(self):
         """Insert closest neighbour chain into path before selected position."""
-
         drone = choice(self.drones)
         neighbour = choice(self.drones)
         parcel1_index = randint(0, len(drone.parcels) - 1)
@@ -224,20 +205,16 @@ class City():
         print('Chain length:', amount)
 
 
-    def _move(self, amount):
-        """Moves random parcel between two random drones amount number of times."""
-
-        for _ in range(amount):
-            drone_from = choice(self.drones)
-            drone_to = choice(self.drones)
-
-            if not drone_from.parcels:
+    def randomly_move_parcels(self, how_many):
+        """Moves how_many parcels between drones at random."""
+        for _ in range(how_many):
+            from_drone = choice(self.drones)
+            if not from_drone.parcels:
                 continue
-
-            parcel_pop_index = randint(0, len(drone_from.parcels) - 1)
-            parcel_insert_index = randint(0, len(drone_to.parcels))
-
-            drone_to.parcels.insert(parcel_insert_index, drone_from.parcels.pop(parcel_pop_index))
+            to_drone = choice(self.drones)
+            pop_index = randint(0, len(from_drone.parcels) - 1)
+            insert_index = randint(0, len(to_drone.parcels))
+            to_drone.parcels.insert(insert_index, from_drone.parcels.pop(pop_index))
 
 
 

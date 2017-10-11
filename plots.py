@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 
 def show_parcels(city):
     """Shows parcels on a map (for now overlaps drone paths)."""
-
     x_positions = [parcel.position.x for parcel in city.parcels]
     y_positions = [parcel.position.y for parcel in city.parcels]
     plt.plot(x_positions, y_positions, 'ro')
@@ -31,7 +30,6 @@ def show_drone_paths(city):
 
 def show_distance_history(city):
     """Plots consecutive iterations of an angorithm."""
-
     plt.ioff()
     plt.clf()
     plt.plot(range(len(city.attempted_total_distances)), city.attempted_total_distances)
