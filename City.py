@@ -163,26 +163,23 @@ class City():
         to_drone = choice(self.drones)
         selected_parcel_index = randrange(0, len(to_drone.parcels))
         selected_parcel = to_drone.parcels[selected_parcel_index]
-        closest_parcel = self.get_closest_neighbour(selected_parcel)
-        for drone in self.drones:
-            for parcel_index, parcel in enumerate(drone.parcels):
-                if parcel == closest_parcel:
-                    drone.parcels.pop(parcel_index)
-                    to_drone.parcels.insert(selected_parcel_index + randint(0, 1), parcel)
-                    return
+        closest_parcel, from_drone = self.get_closest_neighbour_info(selected_parcel)
+        from_drone.parcels.remove(closest_parcel)
+        to_drone.parcels.insert(selected_parcel_index + randint(0, 1), closest_parcel)
 
 
-    def get_closest_neighbour(self, selected_parcel):
-        """Returns a closest neighbour of selected_parcel."""
+    def get_closest_neighbour_info(self, selected_parcel):
+        """Returns selected_parcel's closest neighbour and drone to which it belonged."""
         closest_distance = math.inf
         for drone in self.drones:
-            for parcel in drone.parcels:
-                if parcel != selected_parcel:
-                    new_dist = dist(selected_parcel.position, parcel.position)
+            for neighbour in drone.parcels:
+                if neighbour != selected_parcel:
+                    new_dist = dist(selected_parcel.position, neighbour.position)
                     if new_dist < closest_distance:
-                        closest_parcel = parcel
+                        closest_parcel = neighbour
                         closest_distance = new_dist
-        return closest_parcel
+                        from_drone = drone
+        return closest_parcel, from_drone
 
 
 
