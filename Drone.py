@@ -63,4 +63,4 @@ class Drone(object):
     def path_length(self):
         """Get recalculated path length."""
         path = self.path
-        return sum(dist(point1, point2) for point1, point2 in zip(path[:-1], path[1:]))
+        return sum(dist(point1, point2) for point1, point2 in zip(path[:-1], path[1:])) # TODO consider using itertools pairwise function

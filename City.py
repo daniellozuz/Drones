@@ -31,7 +31,7 @@ class City():
         self.best_total_distance = math.inf
         self.accepted_total_distances = []
         self.attempted_total_distances = []
-        self.best_total_distances = []
+        self.best_total_distances = [] # TODO list(accumulate(best_total_distances, min)) - similar?
 
 
     def __add__(self, items):
