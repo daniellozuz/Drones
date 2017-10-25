@@ -228,44 +228,45 @@ class City():
             drone.parcels.insert(insert_index, drone.parcels.pop(pop_index))
     
 
-    def final_sweep(self, length=3):
+    def final_sweep(self, length=5):
         """Performs final optimization (selects length points in series and selects their best ordering), repeated for all points."""
+        # TODO Should not randomly choose index, instead it should go through every index in drone. If drone has less than length parcels it should devour what it available.
         for drone in self.drones:
-            for i in range(0, len(drone.parcels) - length):
-                previous_drones = [deepcopy(dr) for dr in self.drones]
-                previous_distance = self.total_distance
-                chain = []
-                print('Popping 3 to create a chain.')
-                for _ in range(length):
-                    chain.append(drone.parcels.pop(i))
-                print(chain)
+            i = choice(range(0, len(drone.parcels) - length))
+            previous_drones = [deepcopy(dr) for dr in self.drones]
+            previous_distance = self.total_distance
+            chain = []
+            print('Popping 3 to create a chain.')
+            for _ in range(length):
+                chain.append(drone.parcels.pop(i))
+            print(chain)
+            print(len(drone.parcels))
+            better = False
+            for p in permutations(chain, len(chain)):
+                print('Inserting 3 to try one of permutations.')
+                for par in p:
+                    drone.parcels.insert(i, par)
+                print('Permutation:', p)
                 print(len(drone.parcels))
-                better = False
-                for p in permutations(chain, len(chain)):
-                    print('Inserting 3 to try one of permutations.')
-                    for par in p:
-                        drone.parcels.insert(i, par)
-                    print('Permutation:', p)
-                    print(len(drone.parcels))
-                    self.calculate_total_distance()
-                    distance = self.total_distance
-                    if distance < previous_distance:
-                        better = True
-                        print('Better!')
-                        break
-                    else:
-                        print('Popping 3 because this perutation did not work.')
-                        for _ in range(length):
-                            drone.parcels.pop(i)
-                    self.calculate_total_distance()
-                # Revert
-                if not better:
-                    print('Reverting because no permutation was better.')
-                    print('Amount of parcels before revert:', len(drone.parcels))
-                    for k in range(len(self.drones)):
-                        self.drones[k] = previous_drones[k]
-                    self.calculate_total_distance()
+                self.calculate_total_distance()
+                distance = self.total_distance
+                if distance < previous_distance:
+                    better = True
+                    print('Better!')
                     break
+                else:
+                    print('Popping 3 because this perutation did not work.')
+                    for _ in range(length):
+                        drone.parcels.pop(i)
+                self.calculate_total_distance()
+            # Revert
+            if not better:
+                print('Reverting because no permutation was better.')
+                print('Amount of parcels before revert:', len(drone.parcels))
+                for k in range(len(self.drones)):
+                    self.drones[k] = previous_drones[k]
+                self.calculate_total_distance()
+                break
 
 
 
