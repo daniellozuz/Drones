@@ -7,6 +7,7 @@
 
 
 from copy import deepcopy
+from itertools import permutations
 import json
 import math
 from random import choice, randint, random, randrange, betavariate
@@ -116,17 +117,22 @@ class City():
         self.calculate_total_distance()
 
 
+    def calculate_total_distance(self):
+        """Returns total distance covered by drones."""
+        # TODO Replace distance with time (distance tends to assign most parcels to single drone).
+        self.total_distance = sum(drone.path_length for drone in self.drones)
+
+
     def simulated_annealing(self, scale, temperature):
         """Performs one iteration of simulated annealing algorithm."""
         # TODO needs major refactoring.
         previous_drones = [deepcopy(drone) for drone in self.drones]
         previous_distance = self.total_distance
-        self.randomly_move_parcels(int(math.sqrt(math.sqrt(temperature)) - 3))
-        print('Moving: ', int(math.sqrt(math.sqrt(temperature)) - 3))
+        self.randomly_reinsert_parcels_between_drones(int(math.sqrt(math.sqrt(temperature)) - 3))
+        self.randomly_reinsert_parcels_in_a_drone(int(math.sqrt(math.sqrt(temperature)) - 3))
         self.swap_two_adjacent(int(math.sqrt(math.sqrt(temperature))))
-        print('Swapping: ', int(math.sqrt(math.sqrt(temperature))))
         self.swallow_neighbour()
-        self.catch_neighbour_chain()
+        self.catch_neighbour_chain(int(30 * betavariate(1, 5)))
         self.calculate_total_distance()
         self.attempted_total_distances.append(self.total_distance)
         if self.total_distance < self.best_total_distance:
@@ -142,12 +148,6 @@ class City():
             self.calculate_total_distance()
         self.best_total_distances.append(self.best_total_distance)
         self.accepted_total_distances.append(self.total_distance)
-
-
-    def calculate_total_distance(self):
-        """Returns total distance covered by drones."""
-        # TODO Replace distance with time (distance tends to assign most parcels to single drone).
-        self.total_distance = sum(drone.path_length for drone in self.drones)
 
 
     def swap_two_adjacent(self, amount):
@@ -182,8 +182,8 @@ class City():
         return closest_parcel, from_drone
 
 
-    def catch_neighbour_chain(self):
-        """Insert closest neighbour chain into path before selected position."""
+    def catch_neighbour_chain(self, max_length):
+        """Reinserts chain of parcels (maximum max_length parcels) from one drone to another, preserving order - reversing or not."""
         # TODO needs major refactoring.
         selected_drone = choice(self.drones)
         neighbour = choice(self.drones)
@@ -194,7 +194,7 @@ class City():
         parcel_chain = []
         direction = randint(0, 1)
         amount = 0
-        while len(neighbour.parcels) - 1 >= neighbour_parcel_index and amount <= int(len(neighbour.parcels) * betavariate(1, 5)):
+        while len(neighbour.parcels) - 1 >= neighbour_parcel_index and amount <= max_length:
             parcel_chain.append(neighbour.parcels[neighbour_parcel_index])
             neighbour.parcels.pop(neighbour_parcel_index)
             neighbour_parcel_index -= direction
@@ -205,9 +205,9 @@ class City():
         print('Chain length:', amount)
 
 
-    def randomly_move_parcels(self, how_many):
-        """Moves how_many parcels between drones at random."""
-        for _ in range(how_many):
+    def randomly_reinsert_parcels_between_drones(self, amount):
+        """Moves random parcel between random drones amount number of times."""
+        for _ in range(amount):
             from_drone = choice(self.drones)
             if not from_drone.parcels:
                 continue
@@ -215,6 +215,57 @@ class City():
             pop_index = randrange(0, len(from_drone.parcels))
             insert_index = randint(0, len(to_drone.parcels))
             to_drone.parcels.insert(insert_index, from_drone.parcels.pop(pop_index))
+
+
+    def randomly_reinsert_parcels_in_a_drone(self, amount):
+        """Moves random parcel in a drone to another position amount number of times."""
+        for _ in range(amount):
+            drone = choice(self.drones)
+            if not drone.parcels:
+                continue
+            pop_index = randrange(0, len(drone.parcels))
+            insert_index = randint(0, len(drone.parcels))
+            drone.parcels.insert(insert_index, drone.parcels.pop(pop_index))
+    
+
+    def final_sweep(self, length=3):
+        """Performs final optimization (selects length points in series and selects their best ordering), repeated for all points."""
+        for drone in self.drones:
+            for i in range(0, len(drone.parcels) - length):
+                previous_drones = [deepcopy(dr) for dr in self.drones]
+                previous_distance = self.total_distance
+                chain = []
+                print('Popping 3 to create a chain.')
+                for _ in range(length):
+                    chain.append(drone.parcels.pop(i))
+                print(chain)
+                print(len(drone.parcels))
+                better = False
+                for p in permutations(chain, len(chain)):
+                    print('Inserting 3 to try one of permutations.')
+                    for par in p:
+                        drone.parcels.insert(i, par)
+                    print('Permutation:', p)
+                    print(len(drone.parcels))
+                    self.calculate_total_distance()
+                    distance = self.total_distance
+                    if distance < previous_distance:
+                        better = True
+                        print('Better!')
+                        break
+                    else:
+                        print('Popping 3 because this perutation did not work.')
+                        for _ in range(length):
+                            drone.parcels.pop(i)
+                    self.calculate_total_distance()
+                # Revert
+                if not better:
+                    print('Reverting because no permutation was better.')
+                    print('Amount of parcels before revert:', len(drone.parcels))
+                    for k in range(len(self.drones)):
+                        self.drones[k] = previous_drones[k]
+                    self.calculate_total_distance()
+                    break
 
 
 

@@ -12,10 +12,12 @@ def show_parcels(city):
     plt.plot(city.position.x, city.position.y, 'go')
 
 
-def show_drone_paths(city):
+def show_drone_paths(city, final=False):
     """Shows drones paths on a map."""
     # TODO Legend.
     plt.ion()
+    if final:
+        plt.ioff()
     plt.clf()
     for drone in city.drones:
         if drone.path:

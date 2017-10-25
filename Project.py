@@ -44,11 +44,18 @@ while temperature > 0.1:
     city.simulated_annealing(scale, temperature)
     print('Now', round(city.total_distance), 'Before', round(prev), 'Best', round(prev_best), 'Temp', temperature)
     print('\n')
-    temperature *= 0.9997
+    temperature *= 0.97
     prev = city.total_distance
     if city.total_distance < prev_best:
         plots.show_drone_paths(city)
         prev_best = city.total_distance
     #plots.show_drone_paths(city)
+
+print("before final sweep")
+plots.show_drone_paths(city, final=True)
+for _ in range(100):
+    city.final_sweep()
+print("after final sweepings")
+plots.show_drone_paths(city, final=True)
 
 plots.show_distance_history(city)
