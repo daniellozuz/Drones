@@ -10,7 +10,7 @@ from copy import deepcopy
 from itertools import permutations
 import json
 import math
-from random import choice, randint, random, randrange, betavariate
+from random import choice, randint, random, randrange, betavariate, sample
 import os
 
 from common import Position as Pos
@@ -25,6 +25,7 @@ class City():
 
 
     def __init__(self, position=Pos(0, 0), wind=(0, 0)):
+        self.solution = 0
         self.position = position
         self.wind = wind
         self.drones = []
@@ -86,10 +87,11 @@ class City():
             data = raw_file.read()
         self.wind = tuple([0, 0])
         self.parcels = []
+        self.solution = int(data.strip('\n').split('\n')[0])
         for line in data.strip('\n').split('\n')[1:]:
             parcel_number, pos_x, pos_y = line.split(' ')
             self += Parcel(int(parcel_number), 1, Pos(float(pos_x), float(pos_y)))
-            self.position = Pos(float(pos_x), float(pos_y)) # Gonna be last position in file.
+            self.position = Pos(float(pos_x), float(pos_y)) # Base overlaps with one point.
 
 
     def jstore(self, json_file_name):
@@ -124,7 +126,7 @@ class City():
         """Assigns parcels at random among drones.""" # XXX make it initialization procedure
         for drone in self.drones:
             drone.parcels = []
-        for parcel in self.parcels:
+        for parcel in sample(self.parcels, len(self.parcels)):
             drone = choice(self.drones)
             drone += parcel
         self.calculate_total_distance()

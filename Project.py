@@ -27,7 +27,7 @@ city = City()
 #for i in range(75):
 #    city += Parcel(i + 1, randint(10, 40), Pos(randint(-20, 20), randint(-20, 20)))
 
-city.rload("djibouti.txt")
+city.rload("westernsahara.txt")
 city += Drone(1, 2400, 8, base=city.position)
 
 # Computations and Visualization
