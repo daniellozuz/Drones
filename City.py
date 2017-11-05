@@ -25,6 +25,7 @@ class City():
 
 
     def __init__(self, position=Pos(0, 0), wind=(0, 0)):
+        self.scale = 1000
         self.solution = 0
         self.position = position
         self.wind = wind
@@ -130,6 +131,11 @@ class City():
             drone = choice(self.drones)
             drone += parcel
         self.calculate_total_distance()
+        max_x = max([parcel.position.x for parcel in self.parcels])
+        max_y = max([parcel.position.y for parcel in self.parcels])
+        min_x = min([parcel.position.x for parcel in self.parcels])
+        min_y = min([parcel.position.y for parcel in self.parcels])
+        self.scale = max(max_x - min_x, max_y - min_y)
 
 
     def calculate_total_distance(self):
@@ -152,7 +158,7 @@ class City():
         self.attempted_total_distances.append(self.total_distance)
         if self.total_distance < self.best_total_distance:
             self.best_total_distance = self.total_distance
-        weird_value = math.e ** (scale * (previous_distance - self.total_distance) / temperature)
+        weird_value = math.e ** (10 * len(self.parcels) * (previous_distance - self.total_distance) / (temperature * self.scale))
         print('Weird value:', weird_value)
         if weird_value > random():
             print('Passed.')
@@ -243,7 +249,7 @@ class City():
             drone.parcels.insert(insert_index, drone.parcels.pop(pop_index))
     
 
-    def final_sweep(self, length=3):
+    def final_sweep(self, length=4):
         """Performs final optimization (selects length points in series and selects their best ordering), repeated for all points."""
         # TODO Should not randomly choose index, instead it should go through every index in drone. If drone has less than length parcels it should devour what is available.
         for drone in self.drones:

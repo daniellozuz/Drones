@@ -16,6 +16,7 @@ def show_drone_paths(city, final=False):
     """Shows drones paths on a map."""
     # TODO Legend.
     plt.ion()
+    plt.axis('equal')
     if final:
         plt.ioff()
     plt.clf()

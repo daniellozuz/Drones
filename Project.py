@@ -18,7 +18,7 @@ import plots
 
 # City creation
 city = City()
-city.rload("pr76.txt")
+city.rload("kroD100.txt")
 city += Drone(1, 2400, 8, base=city.position)
 
 # Computations and Visualization
