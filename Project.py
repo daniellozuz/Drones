@@ -27,7 +27,7 @@ city = City()
 #for i in range(75):
 #    city += Parcel(i + 1, randint(10, 40), Pos(randint(-20, 20), randint(-20, 20)))
 
-city.rload("westernsahara.txt")
+city.rload("berlin52.txt")
 city += Drone(1, 2400, 8, base=city.position)
 
 # Computations and Visualization
@@ -41,6 +41,7 @@ prev = city.total_distance
 scale = 1
 temperature = 1000
 
+# TODO implement this loop inside City class
 while temperature > 0.1:
     city.simulated_annealing(scale, temperature)
     print('Now', round(city.total_distance), 'Before', round(prev), 'Best', round(prev_best), 'Temp', temperature)
