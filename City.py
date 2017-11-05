@@ -147,7 +147,7 @@ class City():
         self.randomly_reinsert_parcels_in_a_drone(int(math.sqrt(math.sqrt(temperature)) - 3))
         self.swap_two_adjacent(int(math.sqrt(math.sqrt(temperature))))
         self.swallow_neighbour()
-        self.catch_neighbour_chain(int(30 * betavariate(1, 5)))
+        self.catch_neighbour_chain(int(30 * betavariate(1, 5))) # TODO change 30 into sth appropriate
         self.calculate_total_distance()
         self.attempted_total_distances.append(self.total_distance)
         if self.total_distance < self.best_total_distance:
