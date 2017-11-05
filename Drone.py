@@ -10,10 +10,11 @@ class Drone(object):
     """Provides drone implementation."""
 
 
-    def __init__(self, number, max_capacity, max_speed, parcels=None):
+    def __init__(self, number, max_capacity, max_speed, base=Pos(0, 0), parcels=None):
         self.number = number
         self.max_capacity = max_capacity
         self.max_speed = max_speed
+        self.base = base
         if parcels is None:
             parcels = []
         self.parcels = parcels
@@ -45,17 +46,17 @@ class Drone(object):
 
 
     @property
-    def path(self, base=Pos(0, 0)):
+    def path(self):
         """Get recalculated drone's path."""
         occupied_capacity = 0
-        path = [base]
+        path = [self.base]
         for parcel in self.parcels:
             occupied_capacity += parcel.weight
             if occupied_capacity > self.max_capacity:
-                path.append(base)
+                path.append(self.base)
                 occupied_capacity = parcel.weight
             path.append(parcel.position)
-        path.append(base)
+        path.append(self.base)
         return path
 
 

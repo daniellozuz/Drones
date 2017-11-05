@@ -11,6 +11,7 @@ from itertools import permutations
 import json
 import math
 from random import choice, randint, random, randrange, betavariate
+import os
 
 from common import Position as Pos
 from common import dist
@@ -65,9 +66,9 @@ class City():
         return string
 
 
-    def load(self, json_file_name):
-        """Loads data (city parameters, drones and parcels) from json .txt file."""
-        with open(json_file_name) as json_file:
+    def jload(self, json_file_name):
+        """Loads data from json .txt file stored in "test_json" folder."""
+        with open(os.path.join("json_test", json_file_name)) as json_file:
             data = json.load(json_file)
         self.wind = tuple(data['wind'])
         self.position = Pos(data['position'][0], data['position'][1])
@@ -79,7 +80,19 @@ class City():
             self += Drone(drone['number'], drone['max_capacity'], drone['max_speed'])
 
 
-    def store(self, json_file_name):
+    def rload(self, raw_file_name):
+        """Loads testing data from .txt file in raw format (used for testing algorithm performance)."""
+        with open(os.path.join("raw_test", raw_file_name)) as raw_file:
+            data = raw_file.read()
+        self.wind = tuple([0, 0])
+        self.parcels = []
+        for line in data.strip('\n').split('\n')[1:]:
+            parcel_number, pos_x, pos_y = line.split(' ')
+            self += Parcel(int(parcel_number), 1, Pos(float(pos_x), float(pos_y)))
+            self.position = Pos(float(pos_x), float(pos_y)) # Gonna be last position in file.
+
+
+    def jstore(self, json_file_name):
         """Stores data (city parameters, drones and parcels) to json .txt file."""
         data = {}
         data['wind'] = list(self.wind)
@@ -95,7 +108,7 @@ class City():
                                     "weight" : parcel.weight,
                                     "x" : parcel.position.x,
                                     "y" : parcel.position.y})
-        with open(json_file_name, 'w') as json_file:
+        with open(os.path.join("json_test", json_file_name), 'w') as json_file:
             json.dump(data, json_file, indent=4)
 
 
@@ -194,7 +207,7 @@ class City():
         parcel_chain = []
         direction = randint(0, 1)
         amount = 0
-        while len(neighbour.parcels) - 1 >= neighbour_parcel_index and amount <= max_length:
+        while len(neighbour.parcels) - 1 >= neighbour_parcel_index and amount <= max_length and amount <= len(neighbour.parcels):
             parcel_chain.append(neighbour.parcels[neighbour_parcel_index])
             neighbour.parcels.pop(neighbour_parcel_index)
             neighbour_parcel_index -= direction
@@ -228,9 +241,9 @@ class City():
             drone.parcels.insert(insert_index, drone.parcels.pop(pop_index))
     
 
-    def final_sweep(self, length=5):
+    def final_sweep(self, length=3):
         """Performs final optimization (selects length points in series and selects their best ordering), repeated for all points."""
-        # TODO Should not randomly choose index, instead it should go through every index in drone. If drone has less than length parcels it should devour what it available.
+        # TODO Should not randomly choose index, instead it should go through every index in drone. If drone has less than length parcels it should devour what is available.
         for drone in self.drones:
             i = choice(range(0, len(drone.parcels) - length))
             previous_drones = [deepcopy(dr) for dr in self.drones]

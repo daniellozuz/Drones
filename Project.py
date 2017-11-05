@@ -17,17 +17,18 @@ import plots
 
 
 # City creation
-city = City(position=Pos(0, 0), wind=(1, 2))
+city = City()
 
-city += Drone(1, 2400, 8)
+#city += Drone(1, 2400, 8, base=city.position)
 # city += Drone(2, 203, 15)
 # city += Drone(3, 300, 10)
 # city += Drone(4, 250, 50)
 
-for i in range(75):
-    city += Parcel(i + 1, randint(10, 40), Pos(randint(-20, 20), randint(-20, 20)))
+#for i in range(75):
+#    city += Parcel(i + 1, randint(10, 40), Pos(randint(-20, 20), randint(-20, 20)))
 
-#city.load("grid.txt")
+city.rload("djibouti.txt")
+city += Drone(1, 2400, 8, base=city.position)
 
 # Computations and Visualization
 city.assign()
