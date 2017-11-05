@@ -1,4 +1,5 @@
 """City module tests."""
+# TODO tests are not up to date, they might pass, but prove nothing.
 
 
 import unittest
@@ -91,7 +92,7 @@ class TestCity(unittest.TestCase):
         self.assertEqual(self.city.total_distance, 2.8284271247461903)
 
 
-    def test_load(self):
+    def test_jload(self):
         """Checks loading data from json formatted txt file."""
 
         self.city += self.drone0
@@ -100,7 +101,7 @@ class TestCity(unittest.TestCase):
         self.assertEqual(self.city.drones, [self.drone0])
         self.assertEqual(self.city.parcels, [self.parcel1])
 
-        self.city.load("stub.txt")
+        self.city.jload("stub.txt")
 
         self.assertEqual(len(self.city.drones), 2)
         self.assertIsInstance(self.city.drones[0], Drone)
@@ -113,7 +114,7 @@ class TestCity(unittest.TestCase):
     def test_store(self):
         """Checks storing data to json formatted txt file."""
 
-        self.city.load("stub.txt")
+        self.city.jload("stub.txt")
         self.city.store("stub2.txt")
         self.city.drones = []
         self.city.parcels = []
@@ -121,7 +122,7 @@ class TestCity(unittest.TestCase):
         self.assertEqual(self.city.drones, [])
         self.assertEqual(self.city.parcels, [])
 
-        self.city.load("stub2.txt")
+        self.city.jload("stub2.txt")
 
         self.assertEqual(len(self.city.drones), 2)
         self.assertEqual(len(self.city.parcels), 2)

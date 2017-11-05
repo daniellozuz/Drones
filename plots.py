@@ -16,9 +16,9 @@ def show_drone_paths(city, final=False):
     """Shows drones paths on a map."""
     # TODO Legend.
     plt.ion()
-    plt.axis('equal')
     if final:
         plt.ioff()
+    plt.axis('equal')
     plt.clf()
     for drone in city.drones:
         if drone.path:
@@ -28,7 +28,8 @@ def show_drone_paths(city, final=False):
     if city.solution == 0:
         plt.title('Total distance: ' + str(round(city.total_distance, 2)))
     else:
-        plt.title('Total distance: ' + str(round(city.total_distance, 2)) + ' Solution: ' + str(city.solution) + ' (+' + str(int(100 * (city.total_distance - city.solution) / city.solution)) + '% overshoot)')
+        percentage = int(100 * (city.total_distance - city.solution) / city.solution)
+        plt.title('Total distance: ' + str(round(city.total_distance, 2)) + ' Solution: ' + str(city.solution) + ' (+' + str(percentage) + '% overshoot)')
     plt.show()
     show_parcels(city)
     plt.pause(0.05)

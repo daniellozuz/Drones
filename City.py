@@ -83,7 +83,7 @@ class City():
 
 
     def rload(self, raw_file_name):
-        """Loads testing data from .txt file in raw format (used for testing algorithm performance)."""
+        """Loads performance testing data from .txt file in raw format."""
         with open(os.path.join("raw_test", raw_file_name)) as raw_file:
             data = raw_file.read()
         self.wind = tuple([0, 0])
@@ -95,7 +95,7 @@ class City():
             self.position = Pos(float(pos_x), float(pos_y)) # Base overlaps with one point.
 
 
-    def jstore(self, json_file_name):
+    def store(self, json_file_name):
         """Stores data (city parameters, drones and parcels) to json .txt file."""
         data = {}
         data['wind'] = list(self.wind)
@@ -144,8 +144,11 @@ class City():
         self.total_distance = sum(drone.path_length for drone in self.drones)
 
 
-    def full_simulated_annealing(self, initial_temperature=1000, final_temperature=0.1):
+    def full_simulated_annealing(self, initial_temperature=1000, final_temperature=0.1, cooling_rate=0.9997):
         """Loops over sim annealing."""
+        self.assign()
+        plots.show_parcels(self)
+        plots.show_drone_paths(self)
         temperature = initial_temperature
         prev_best = self.total_distance
         prev = self.total_distance
@@ -153,7 +156,7 @@ class City():
             self.simulated_annealing(temperature)
             print('Now', round(self.total_distance), 'Before', round(prev), 'Best', round(prev_best), 'Temp', temperature)
             print('\n')
-            temperature *= 0.9997
+            temperature *= cooling_rate
             prev = self.total_distance
             if self.total_distance < prev_best:
                 plots.show_drone_paths(self)
@@ -312,15 +315,12 @@ class City():
 if __name__ == '__main__':
 
     city = City(position=Pos(0, 0), wind=(1, 2))
-    city += Drone(1, 140, 8)
-    city += Drone(2, 103, 15)
 
     for i in range(5):
         city += Parcel(i + 1, randint(10, 40), Pos(randint(-20, 20), randint(-20, 20)))
+    city += Drone(1, 140, 8)
+    city += Drone(2, 103, 15)
 
-    print(city)
-    print(city.total_distance)
-    city.assign()
     print(city)
     print(city.total_distance)
 

@@ -21,11 +21,7 @@ city = City()
 city.rload("westernsahara29.txt")
 city += Drone(1, 2400, 8, base=city.position)
 
-# Computations and Visualization
-city.assign()
-plots.show_parcels(city)
-plots.show_drone_paths(city)
-
+# Computations
 city.full_simulated_annealing()
 
 print("before final sweep")
