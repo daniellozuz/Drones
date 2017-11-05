@@ -58,24 +58,14 @@ class TestCity(unittest.TestCase):
         self.assertEqual(self.city.parcels, [self.parcel1, self.parcel2])
 
 
-    def test_set_wind(self):
-        """Check changing the wind."""
-
-        self.assertEqual(self.city.wind, (1, 2))
-
-        self.city.set_wind((-6, -7))
-
-        self.assertEqual(self.city.wind, (-6, -7))
-
-
-    def test_assign(self):
+    def test_prepare_algorithm(self):
         """Checks whether parcels are assigned to drones."""
 
         self.assertEqual((sum(len(drone.parcels) for drone in self.city.drones)), 0)
 
         self.city += [self.drone0, self.drone1]
         self.city += [self.parcel1, self.parcel2]
-        self.city.assign()
+        self.city.prepare_algorithm()
 
         self.assertEqual((sum(len(drone.parcels) for drone in self.city.drones)), 2)
 
@@ -87,7 +77,7 @@ class TestCity(unittest.TestCase):
 
         self.city += self.drone0
         self.city += self.parcel1
-        self.city.assign()
+        self.city.prepare_algorithm()
 
         self.assertEqual(self.city.total_distance, 2.8284271247461903)
 

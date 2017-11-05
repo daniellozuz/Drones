@@ -25,11 +25,11 @@ def show_drone_paths(city, final=False):
             plt.plot(*zip(*drone.path))
         else:
             print("Error: no path to be displayed.")
-    if city.solution == 0:
-        plt.title('Total distance: ' + str(round(city.total_distance, 2)))
-    else:
+    if city.solution:
         percentage = int(100 * (city.total_distance - city.solution) / city.solution)
-        plt.title('Total distance: ' + str(round(city.total_distance, 2)) + ' Solution: ' + str(city.solution) + ' (+' + str(percentage) + '% overshoot)')
+        plt.title('Total distance: ' + str(round(city.total_distance)) + ' Solution: ' + str(city.solution) + ' (+' + str(percentage) + '% overshoot)')
+    else:
+        plt.title('Total distance: ' + str(round(city.total_distance)))
     plt.show()
     show_parcels(city)
     plt.pause(0.05)
@@ -39,7 +39,7 @@ def show_distance_history(city):
     """Plots consecutive iterations of an angorithm."""
     plt.ioff()
     plt.clf()
-    plt.plot(range(len(city.attempted_total_distances)), city.attempted_total_distances)
-    plt.plot(range(len(city.accepted_total_distances)), city.accepted_total_distances)
-    plt.plot(range(len(city.best_total_distances)), city.best_total_distances, 'g')
+    plt.plot(range(len(city.stats['attempted_total_distances'])), city.stats['attempted_total_distances'])
+    plt.plot(range(len(city.stats['accepted_total_distances'])), city.stats['accepted_total_distances'])
+    plt.plot(range(len(city.stats['best_total_distances'])), city.stats['best_total_distances'], 'g')
     plt.show()

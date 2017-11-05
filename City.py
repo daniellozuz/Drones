@@ -26,16 +26,19 @@ class City():
 
     def __init__(self, position=Pos(0, 0), wind=(0, 0)):
         self.scale = 1000
-        self.solution = 0
+        self.solution = None
         self.position = position
         self.wind = wind
         self.drones = []
         self.parcels = []
         self.total_distance = 0
         self.best_total_distance = math.inf
-        self.accepted_total_distances = []
-        self.attempted_total_distances = []
-        self.best_total_distances = [] # TODO list(accumulate(best_total_distances, min)) - similar?
+        #self.accepted_total_distances = []
+        #self.attempted_total_distances = []
+        #self.best_total_distances = [] # TODO list(accumulate(best_total_distances, min)) - similar?
+        self.stats = {'accepted_total_distances' : [],
+                      'attempted_total_distances' : [],
+                      'best_total_distances' : []}
 
 
     def __add__(self, items):
@@ -85,14 +88,13 @@ class City():
     def rload(self, raw_file_name):
         """Loads performance testing data from .txt file in raw format."""
         with open(os.path.join("raw_test", raw_file_name)) as raw_file:
-            data = raw_file.read()
-        self.wind = tuple([0, 0])
+            data = raw_file.read().strip('\n')
+        self.solution = int(data.split('\n')[0])
         self.parcels = []
-        self.solution = int(data.strip('\n').split('\n')[0])
-        for line in data.strip('\n').split('\n')[1:]:
+        for line in data.split('\n')[1:]:
             parcel_number, pos_x, pos_y = line.split(' ')
             self += Parcel(int(parcel_number), 1, Pos(float(pos_x), float(pos_y)))
-            self.position = Pos(float(pos_x), float(pos_y)) # Base overlaps with one point.
+            self.position = Pos(float(pos_x), float(pos_y)) # Base overlaps with last point.
 
 
     def store(self, json_file_name):
@@ -115,16 +117,8 @@ class City():
             json.dump(data, json_file, indent=4)
 
 
-    def set_wind(self, wind):
-        """Sets wind to given value."""
-        if isinstance(wind, tuple) and len(wind) == 2:
-            self.wind = wind
-        else:
-            raise TypeError
-
-
-    def assign(self):
-        """Assigns parcels at random among drones.""" # XXX make it initialization procedure
+    def prepare_algorithm(self):
+        """Initialization procedure to prepare simulated annealing algorithm."""
         for drone in self.drones:
             drone.parcels = []
         for parcel in sample(self.parcels, len(self.parcels)):
@@ -146,16 +140,15 @@ class City():
 
     def full_simulated_annealing(self, initial_temperature=1000, final_temperature=0.1, cooling_rate=0.9997):
         """Loops over sim annealing."""
-        self.assign()
+        self.prepare_algorithm()
         plots.show_parcels(self)
         plots.show_drone_paths(self)
-        temperature = initial_temperature
         prev_best = self.total_distance
         prev = self.total_distance
+        temperature = initial_temperature
         while temperature > final_temperature:
             self.simulated_annealing(temperature)
-            print('Now', round(self.total_distance), 'Before', round(prev), 'Best', round(prev_best), 'Temp', temperature)
-            print('\n')
+            print('Now', round(self.total_distance), 'Before', round(prev), 'Best', round(prev_best), 'Temp', temperature, '\n')
             temperature *= cooling_rate
             prev = self.total_distance
             if self.total_distance < prev_best:
@@ -174,7 +167,7 @@ class City():
         self.swallow_neighbour()
         self.catch_neighbour_chain(int(30 * betavariate(1, 5))) # TODO change 30 into sth appropriate
         self.calculate_total_distance()
-        self.attempted_total_distances.append(self.total_distance)
+        self.stats['attempted_total_distances'].append(self.total_distance)
         if self.total_distance < self.best_total_distance:
             self.best_total_distance = self.total_distance
         weird_value = math.e ** (10 * len(self.parcels) * (previous_distance - self.total_distance) / (temperature * self.scale))
@@ -186,8 +179,8 @@ class City():
             for i in range(len(self.drones)):
                 self.drones[i] = previous_drones[i]
             self.calculate_total_distance()
-        self.best_total_distances.append(self.best_total_distance)
-        self.accepted_total_distances.append(self.total_distance)
+        self.stats['best_total_distances'].append(self.best_total_distance)
+        self.stats['accepted_total_distances'].append(self.total_distance)
 
 
     def swap_two_adjacent(self, amount):
