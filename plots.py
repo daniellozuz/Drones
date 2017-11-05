@@ -14,7 +14,6 @@ def show_parcels(city):
 
 def show_drone_paths(city, final=False):
     """Shows drones paths on a map."""
-    # TODO Legend.
     plt.ion()
     if final:
         plt.ioff()
@@ -27,7 +26,8 @@ def show_drone_paths(city, final=False):
             print("Error: no path to be displayed.")
     if city.solution:
         percentage = int(100 * (city.total_distance - city.solution) / city.solution)
-        plt.title('Total distance: ' + str(round(city.total_distance)) + ' Solution: ' + str(city.solution) + ' (+' + str(percentage) + '% overshoot)')
+        plt.title('Total distance: ' + str(round(city.total_distance)) + ' Solution: ' +\
+                  str(city.solution) + ' (+' + str(percentage) + '% overshoot)')
     else:
         plt.title('Total distance: ' + str(round(city.total_distance)))
     plt.show()
@@ -47,6 +47,7 @@ def show_distance_and_modification_history(city):
     plt.subplot(212)
     handles = []
     for key, value in city.stats.items():
-        handles.extend(plt.plot(value, label=str(key)))
-    plt.legend(handles=handles, loc=4)
+        if str(key) != 'neighbour_chain_lengths':
+            handles.extend(plt.plot(value, label=str(key)))
+    plt.legend(handles=handles, loc=1)
     plt.show()

@@ -33,7 +33,7 @@ class City():
         self.parcels = []
         self.total_distance = 0
         self.best_total_distance = math.inf
-        #self.best_total_distances = [] # TODO list(accumulate(best_total_distances, min)) - similar?
+        # XXX list(accumulate(best_total_distances, min)) - similar?
         self.total_distances = {'accepted' : [],
                                 'attempted' : [],
                                 'best' : [],}
@@ -41,7 +41,7 @@ class City():
                       'random_reinsertions_between_drones' : [],
                       'random_reinsertions_in_a_drone' : [],
                       'adjacent_swaps' : [],
-                      'neighour_swallowings' : [],
+                      'neighbour_swallowings' : [],
                       'neighbour_chain_lengths' : [],}
 
 
@@ -165,19 +165,19 @@ class City():
         # TODO needs major refactoring.
         previous_drones = [deepcopy(drone) for drone in self.drones]
         previous_distance = self.total_distance
-        amount = int(math.sqrt(math.sqrt(temperature)) - 3)
+        amount = max(0, int(math.sqrt(math.sqrt(temperature)) - 3))
         self.stats['random_reinsertions_between_drones'].append(amount)
         self.randomly_reinsert_parcels_between_drones(amount)
-        amount = int(math.sqrt(math.sqrt(temperature)) - 3)
+        amount = max(0, int(math.sqrt(math.sqrt(temperature)) - 2))
         self.stats['random_reinsertions_in_a_drone'].append(amount)
         self.randomly_reinsert_parcels_in_a_drone(amount)
         amount = int(math.sqrt(math.sqrt(temperature)))
         self.stats['adjacent_swaps'].append(amount)
         self.swap_two_adjacent(amount)
         amount = 1
-        self.stats['neighour_swallowings'].append(amount)
+        self.stats['neighbour_swallowings'].append(amount)
         self.swallow_neighbour()
-        amount = int(30 * betavariate(1, 5)) # TODO change 30 into sth appropriate
+        amount = int(len(self.parcels) * betavariate(1, 5))
         self.stats['neighbour_chain_lengths'].append(amount)
         self.catch_neighbour_chain(amount)
         self.calculate_total_distance()
@@ -273,10 +273,11 @@ class City():
             pop_index = randrange(0, len(drone.parcels))
             insert_index = randint(0, len(drone.parcels))
             drone.parcels.insert(insert_index, drone.parcels.pop(pop_index))
-    
+
 
     def final_sweep(self, length=4):
-        """Performs final optimization (selects length points in series and selects their best ordering), repeated for all points."""
+        """Performs final optimization (selects length points in series and selects their best
+        ordering), repeated for all points."""
         # TODO Should not randomly choose index, instead it should go through every index in drone. If drone has less than length parcels it should devour what is available.
         for drone in self.drones:
             i = choice(range(0, len(drone.parcels) - length))
@@ -333,10 +334,6 @@ if __name__ == '__main__':
 
     plots.show_parcels(city)
     plots.show_drone_paths(city)
-
-    print(city.wind)
-    city.set_wind((10, 20))
-    print(city.wind)
 
     city.simulated_annealing(1000)
 
