@@ -18,30 +18,15 @@ import plots
 
 # City creation
 city = City()
-city.rload("kroD100.txt")
+city.rload("westernsahara29.txt")
 city += Drone(1, 2400, 8, base=city.position)
 
 # Computations and Visualization
 city.assign()
 plots.show_parcels(city)
 plots.show_drone_paths(city)
-prev_best = city.total_distance
-prev = city.total_distance
 
-# TODO Calculate scale from loaded data, just before launching simulated annealing.
-scale = 1
-temperature = 1000
-
-# TODO Implement this loop inside City class.
-while temperature > 0.1:
-    city.simulated_annealing(scale, temperature)
-    print('Now', round(city.total_distance), 'Before', round(prev), 'Best', round(prev_best), 'Temp', temperature)
-    print('\n')
-    temperature *= 0.9997
-    prev = city.total_distance
-    if city.total_distance < prev_best:
-        plots.show_drone_paths(city)
-        prev_best = city.total_distance
+city.full_simulated_annealing()
 
 print("before final sweep")
 plots.show_drone_paths(city, final=True)

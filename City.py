@@ -144,7 +144,23 @@ class City():
         self.total_distance = sum(drone.path_length for drone in self.drones)
 
 
-    def simulated_annealing(self, scale, temperature):
+    def full_simulated_annealing(self, initial_temperature=1000, final_temperature=0.1):
+        """Loops over sim annealing."""
+        temperature = initial_temperature
+        prev_best = self.total_distance
+        prev = self.total_distance
+        while temperature > final_temperature:
+            self.simulated_annealing(temperature)
+            print('Now', round(self.total_distance), 'Before', round(prev), 'Best', round(prev_best), 'Temp', temperature)
+            print('\n')
+            temperature *= 0.9997
+            prev = self.total_distance
+            if self.total_distance < prev_best:
+                plots.show_drone_paths(self)
+                prev_best = self.total_distance
+
+
+    def simulated_annealing(self, temperature):
         """Performs one iteration of simulated annealing algorithm."""
         # TODO needs major refactoring.
         previous_drones = [deepcopy(drone) for drone in self.drones]
@@ -315,7 +331,7 @@ if __name__ == '__main__':
     city.set_wind((10, 20))
     print(city.wind)
 
-    city.simulated_annealing(0.01, 1000)
+    city.simulated_annealing(1000)
 
     print(city.total_distance)
     print('Parcelki 0 :)', city.drones[0].parcels)
