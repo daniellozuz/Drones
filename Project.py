@@ -22,7 +22,7 @@ city.rload("westernsahara29.txt")
 city += Drone(1, 2400, 8, base=city.position)
 
 # Computations
-city.full_simulated_annealing()
+city.full_simulated_annealing(cooling_rate=0.99)
 
 print("before final sweep")
 plots.show_drone_paths(city, final=True)
@@ -31,4 +31,4 @@ for _ in range(100):
 print("after final sweepings")
 plots.show_drone_paths(city, final=True)
 
-plots.show_distance_history(city)
+plots.show_distance_and_modification_history(city)

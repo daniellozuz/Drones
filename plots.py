@@ -35,11 +35,18 @@ def show_drone_paths(city, final=False):
     plt.pause(0.05)
 
 
-def show_distance_history(city):
+def show_distance_and_modification_history(city):
     """Plots consecutive iterations of an angorithm."""
     plt.ioff()
     plt.clf()
-    plt.plot(range(len(city.stats['attempted_total_distances'])), city.stats['attempted_total_distances'])
-    plt.plot(range(len(city.stats['accepted_total_distances'])), city.stats['accepted_total_distances'])
-    plt.plot(range(len(city.stats['best_total_distances'])), city.stats['best_total_distances'], 'g')
+    plt.subplot(211)
+    handles = []
+    for key, value in city.total_distances.items():
+        handles.extend(plt.plot(value, label=str(key)))
+    plt.legend(handles=handles)
+    plt.subplot(212)
+    handles = []
+    for key, value in city.stats.items():
+        handles.extend(plt.plot(value, label=str(key)))
+    plt.legend(handles=handles, loc=4)
     plt.show()

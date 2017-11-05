@@ -33,12 +33,16 @@ class City():
         self.parcels = []
         self.total_distance = 0
         self.best_total_distance = math.inf
-        #self.accepted_total_distances = []
-        #self.attempted_total_distances = []
         #self.best_total_distances = [] # TODO list(accumulate(best_total_distances, min)) - similar?
-        self.stats = {'accepted_total_distances' : [],
-                      'attempted_total_distances' : [],
-                      'best_total_distances' : []}
+        self.total_distances = {'accepted' : [],
+                                'attempted' : [],
+                                'best' : [],}
+        self.stats = {'temperatures' : [],
+                      'random_reinsertions_between_drones' : [],
+                      'random_reinsertions_in_a_drone' : [],
+                      'adjacent_swaps' : [],
+                      'neighour_swallowings' : [],
+                      'neighbour_chain_lengths' : [],}
 
 
     def __add__(self, items):
@@ -161,13 +165,23 @@ class City():
         # TODO needs major refactoring.
         previous_drones = [deepcopy(drone) for drone in self.drones]
         previous_distance = self.total_distance
-        self.randomly_reinsert_parcels_between_drones(int(math.sqrt(math.sqrt(temperature)) - 3))
-        self.randomly_reinsert_parcels_in_a_drone(int(math.sqrt(math.sqrt(temperature)) - 3))
-        self.swap_two_adjacent(int(math.sqrt(math.sqrt(temperature))))
+        amount = int(math.sqrt(math.sqrt(temperature)) - 3)
+        self.stats['random_reinsertions_between_drones'].append(amount)
+        self.randomly_reinsert_parcels_between_drones(amount)
+        amount = int(math.sqrt(math.sqrt(temperature)) - 3)
+        self.stats['random_reinsertions_in_a_drone'].append(amount)
+        self.randomly_reinsert_parcels_in_a_drone(amount)
+        amount = int(math.sqrt(math.sqrt(temperature)))
+        self.stats['adjacent_swaps'].append(amount)
+        self.swap_two_adjacent(amount)
+        amount = 1
+        self.stats['neighour_swallowings'].append(amount)
         self.swallow_neighbour()
-        self.catch_neighbour_chain(int(30 * betavariate(1, 5))) # TODO change 30 into sth appropriate
+        amount = int(30 * betavariate(1, 5)) # TODO change 30 into sth appropriate
+        self.stats['neighbour_chain_lengths'].append(amount)
+        self.catch_neighbour_chain(amount)
         self.calculate_total_distance()
-        self.stats['attempted_total_distances'].append(self.total_distance)
+        self.total_distances['attempted'].append(self.total_distance)
         if self.total_distance < self.best_total_distance:
             self.best_total_distance = self.total_distance
         weird_value = math.e ** (10 * len(self.parcels) * (previous_distance - self.total_distance) / (temperature * self.scale))
@@ -179,8 +193,8 @@ class City():
             for i in range(len(self.drones)):
                 self.drones[i] = previous_drones[i]
             self.calculate_total_distance()
-        self.stats['best_total_distances'].append(self.best_total_distance)
-        self.stats['accepted_total_distances'].append(self.total_distance)
+        self.total_distances['best'].append(self.best_total_distance)
+        self.total_distances['accepted'].append(self.total_distance)
 
 
     def swap_two_adjacent(self, amount):
