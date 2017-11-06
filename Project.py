@@ -18,11 +18,11 @@ import plots
 
 # City creation
 city = City()
-city.rload("westernsahara29.txt")
+city.cload("usa.txt")
 city += Drone(1, 2400, 8, base=city.position)
 
 # Computations
-city.full_simulated_annealing(cooling_rate=0.99)
+city.full_simulated_annealing()
 
 print("before final sweep")
 plots.show_drone_paths(city, final=True)

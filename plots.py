@@ -42,7 +42,7 @@ def show_distance_and_modification_history(city):
     plt.subplot(211)
     handles = []
     for key, value in city.total_distances.items():
-        handles.extend(plt.plot(value, label=str(key)))
+        handles.extend(plt.plot(value, label=str(key), alpha=0.7))
     plt.legend(handles=handles)
     plt.subplot(212)
     handles = []

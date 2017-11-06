@@ -12,6 +12,8 @@ import json
 import math
 from random import choice, randint, random, randrange, betavariate, sample
 import os
+from statistics import mean
+from math import cos, radians
 
 from common import Position as Pos
 from common import dist
@@ -99,6 +101,28 @@ class City():
             parcel_number, pos_x, pos_y = line.split(' ')
             self += Parcel(int(parcel_number), 1, Pos(float(pos_x), float(pos_y)))
             self.position = Pos(float(pos_x), float(pos_y)) # Base overlaps with last point.
+
+
+    def cload(self, coord_file_name):
+        """Loads data from GPS coordinates. The solutions are approximate due to conversion to xy coordinates."""
+        with open(os.path.join("coord_test", coord_file_name)) as coord_file:
+            data = coord_file.read().strip('\n')
+        self.solution = int(data.split('\n')[0])
+        self.parcels = []
+        th0 = mean(float(line.split(' ')[1]) for line in data.split('\n')[1:])
+        for line in data.split('\n')[1:]:
+            parcel_number, pos_x, pos_y = self.convert(line, th0)
+            self += Parcel(parcel_number, 1, Pos(pos_x, pos_y))
+            self.position = Pos(pos_x, pos_y) # Base overlaps with last point.
+
+
+    def convert(self, line, th0):
+        """Converts a line into a tuple: (number, pox_x, pos_y)."""
+        parcel_number, latitude, longitude = line.split(' ')
+        R = 6371000
+        pos_x = round(R * radians(float(longitude)) * cos(radians(th0)))
+        pos_y = round(R * radians(float(latitude)))
+        return int(parcel_number), pos_x, pos_y
 
 
     def store(self, json_file_name):
