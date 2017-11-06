@@ -182,6 +182,13 @@ class City():
             if self.total_distance < prev_best:
                 plots.show_drone_paths(self)
                 prev_best = self.total_distance
+        print("before final sweep")
+        plots.show_drone_paths(self, final=True)
+        for _ in range(100):
+            self.final_sweep()
+        print("after final sweepings")
+        plots.show_drone_paths(self, final=True)
+        plots.show_distance_and_modification_history(self)
 
 
     def simulated_annealing(self, temperature):

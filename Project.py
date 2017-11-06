@@ -23,12 +23,3 @@ city += Drone(1, 2400, 8, base=city.position)
 
 # Computations
 city.full_simulated_annealing()
-
-print("before final sweep")
-plots.show_drone_paths(city, final=True)
-for _ in range(100):
-    city.final_sweep()
-print("after final sweepings")
-plots.show_drone_paths(city, final=True)
-
-plots.show_distance_and_modification_history(city)
