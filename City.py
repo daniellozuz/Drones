@@ -168,7 +168,7 @@ class City():
         if self.metric == 'simple':
             self.total_distance = sum(drone.path_length for drone in self.drones)
         if self.metric == 'total_time':
-            self.total_distance = sum(drone.total_time for drone in self.drones)
+            self.total_distance = max(drone.total_time for drone in self.drones)
 
 
     def test_everything(self, cooling_rate=0.99):
@@ -202,7 +202,7 @@ class City():
         prev = self.total_distance
         temperature = initial_temperature
         while temperature > final_temperature:
-            self.simulated_annealing(temperature, test=True)
+            self.simulated_annealing(temperature, test=test)
             if not test:
                 print('Now', round(self.total_distance), 'Before', round(prev), 'Best', round(prev_best), 'Temp', temperature, '\n')
             temperature *= cooling_rate
@@ -225,15 +225,18 @@ class City():
     def simulated_annealing(self, temperature, test=False):
         """Performs one iteration of simulated annealing algorithm."""
         # TODO needs major refactoring.
+        xxx = 1
+        if len(self.drones) == 1:
+            xxx = 0
         previous_drones = [deepcopy(drone) for drone in self.drones]
         previous_distance = self.total_distance
-        amount = max(0, int(math.sqrt(math.sqrt(temperature)) - 3))
+        amount = max(xxx, int(math.sqrt(math.sqrt(temperature)) - 3))
         self.stats['random_reinsertions_between_drones'].append(amount)
         self.randomly_reinsert_parcels_between_drones(amount)
-        amount = max(0, int(math.sqrt(math.sqrt(temperature)) - 2))
+        amount = max(xxx, int(math.sqrt(math.sqrt(temperature)) - 2))
         self.stats['random_reinsertions_in_a_drone'].append(amount)
         self.randomly_reinsert_parcels_in_a_drone(amount)
-        amount = int(math.sqrt(math.sqrt(temperature)))
+        amount = max(xxx, int(math.sqrt(math.sqrt(temperature))))
         self.stats['adjacent_swaps'].append(amount)
         self.swap_two_adjacent(amount)
         amount = 1
@@ -277,6 +280,9 @@ class City():
     def swallow_neighbour(self):
         """Insert closest neighbour into path before or after selected parcel."""
         to_drone = choice(self.drones)
+        # TODO change it!
+        if len(to_drone.parcels) < 1:
+            return
         selected_parcel_index = randrange(0, len(to_drone.parcels))
         selected_parcel = to_drone.parcels[selected_parcel_index]
         closest_parcel, from_drone = self.get_closest_neighbour_info(selected_parcel)
