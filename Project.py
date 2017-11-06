@@ -18,7 +18,7 @@ import plots
 
 # City creation
 city = City()
-city.cload("usa.txt")
+city.cload("danpolska.txt")
 city += Drone(1, 2400, 8, base=city.position)
 
 # Computations
