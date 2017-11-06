@@ -170,13 +170,18 @@ class City():
     def test_everything(self, cooling_rate=0.99):
         """Performs simulated annealing for all test cases and creates .txt file with summary."""
         raw_test_cases = [f for f in os.listdir(os.path.join(os.getcwd(), "raw_test"))]
-        print(raw_test_cases)
+        coord_test_cases = [f for f in os.listdir(os.path.join(os.getcwd(), "coord_test"))]
+        test_cases = raw_test_cases + coord_test_cases
+        print(test_cases)
         with open(os.path.join("test_results", datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S.txt')), 'w') as result_file:
             result_file.write('\t'.join(['Test case', 'Result', 'Sol', 'Overshoot\n']))
-            for test_case in raw_test_cases[1:]:
+            for test_case in test_cases:
                 print("Testing", test_case)
-                self.rload(test_case)
-                self.full_simulated_annealing(cooling_rate=0.99, test=True)
+                if test_case in raw_test_cases:
+                    self.rload(test_case)
+                if test_case in coord_test_cases:
+                    self.cload(test_case)
+                self.full_simulated_annealing(cooling_rate=cooling_rate, test=True)
                 print(test_case, round(self.total_distance), self.solution)
                 overshoot = round(100 * (self.total_distance - self.solution) / self.solution)
                 print('Overshoot', overshoot, '%')
