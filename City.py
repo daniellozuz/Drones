@@ -14,6 +14,7 @@ from random import choice, randint, random, randrange, betavariate, sample
 import os
 from statistics import mean
 from math import cos, radians
+import datetime
 
 from common import Position as Pos
 from common import dist
@@ -166,32 +167,53 @@ class City():
         self.total_distance = sum(drone.path_length for drone in self.drones)
 
 
-    def full_simulated_annealing(self, initial_temperature=1000, final_temperature=0.1, cooling_rate=0.9997):
+    def test_everything(self, cooling_rate=0.99):
+        """Performs simulated annealing for all test cases and creates .txt file with summary."""
+        raw_test_cases = [f for f in os.listdir(os.path.join(os.getcwd(), "raw_test"))]
+        print(raw_test_cases)
+        with open(os.path.join("test_results", datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S.txt')), 'w') as result_file:
+            result_file.write('\t'.join(['Test case', 'Result', 'Sol', 'Overshoot\n']))
+            for test_case in raw_test_cases[1:]:
+                print("Testing", test_case)
+                self.rload(test_case)
+                self.full_simulated_annealing(cooling_rate=0.99, test=True)
+                print(test_case, round(self.total_distance), self.solution)
+                overshoot = round(100 * (self.total_distance - self.solution) / self.solution)
+                print('Overshoot', overshoot, '%')
+                result_file.write('\t'.join([test_case, str(round(self.total_distance)), str(self.solution), str(overshoot) + '%\n']))
+
+
+    def full_simulated_annealing(self, initial_temperature=1000, final_temperature=0.1, cooling_rate=0.9997, test=False):
         """Loops over sim annealing."""
         self.prepare_algorithm()
-        plots.show_parcels(self)
-        plots.show_drone_paths(self)
+        if not test:
+            plots.show_parcels(self)
+            plots.show_drone_paths(self)
         prev_best = self.total_distance
         prev = self.total_distance
         temperature = initial_temperature
         while temperature > final_temperature:
-            self.simulated_annealing(temperature)
-            print('Now', round(self.total_distance), 'Before', round(prev), 'Best', round(prev_best), 'Temp', temperature, '\n')
+            self.simulated_annealing(temperature, test=True)
+            if not test:
+                print('Now', round(self.total_distance), 'Before', round(prev), 'Best', round(prev_best), 'Temp', temperature, '\n')
             temperature *= cooling_rate
             prev = self.total_distance
             if self.total_distance < prev_best:
-                plots.show_drone_paths(self)
+                if not test:
+                    plots.show_drone_paths(self)
                 prev_best = self.total_distance
-        print("before final sweep")
-        plots.show_drone_paths(self, final=True)
+        if not test:
+            print("before final sweep")
+            plots.show_drone_paths(self, final=True)
         for _ in range(100):
-            self.final_sweep()
-        print("after final sweepings")
-        plots.show_drone_paths(self, final=True)
-        plots.show_distance_and_modification_history(self)
+            self.final_sweep(test=test)
+        if not test:
+            print("after final sweepings")
+            plots.show_drone_paths(self, final=True)
+            plots.show_distance_and_modification_history(self)
 
 
-    def simulated_annealing(self, temperature):
+    def simulated_annealing(self, temperature, test=False):
         """Performs one iteration of simulated annealing algorithm."""
         # TODO needs major refactoring.
         previous_drones = [deepcopy(drone) for drone in self.drones]
@@ -215,12 +237,18 @@ class City():
         self.total_distances['attempted'].append(self.total_distance)
         if self.total_distance < self.best_total_distance:
             self.best_total_distance = self.total_distance
-        weird_value = math.e ** (10 * len(self.parcels) * (previous_distance - self.total_distance) / (temperature * self.scale))
-        print('Weird value:', weird_value)
+        exponent = 10 * len(self.parcels) * (previous_distance - self.total_distance) / (temperature * self.scale)
+        if exponent > 100:
+            exponent = 100
+        weird_value = math.e ** exponent
+        if not test:
+            print('Weird value:', weird_value)
         if weird_value > random():
-            print('Passed.')
+            if not test:
+                print('Passed.')
         else:
-            print('Revert.')
+            if not test:
+                print('Revert.')
             for i in range(len(self.drones)):
                 self.drones[i] = previous_drones[i]
             self.calculate_total_distance()
@@ -280,7 +308,7 @@ class City():
         offset = randint(0, 1)
         for parcel in choice([parcel_chain, reversed(parcel_chain)]):
             selected_drone.parcels.insert(selected_drone_parcel_index + offset, parcel)
-        print('Chain length:', amount)
+        #print('Chain length:', amount)
 
 
     def randomly_reinsert_parcels_between_drones(self, amount):
@@ -306,7 +334,7 @@ class City():
             drone.parcels.insert(insert_index, drone.parcels.pop(pop_index))
 
 
-    def final_sweep(self, length=4):
+    def final_sweep(self, length=4, test=False):
         """Performs final optimization (selects length points in series and selects their best
         ordering), repeated for all points."""
         # TODO Should not randomly choose index, instead it should go through every index in drone. If drone has less than length parcels it should devour what is available.
@@ -315,33 +343,40 @@ class City():
             previous_drones = [deepcopy(dr) for dr in self.drones]
             previous_distance = self.total_distance
             chain = []
-            print('Popping 3 to create a chain.')
+            if not test:
+                print('Popping 3 to create a chain.')
             for _ in range(length):
                 chain.append(drone.parcels.pop(i))
-            print(chain)
-            print(len(drone.parcels))
+            if not test:
+                print(chain)
+                print(len(drone.parcels))
             better = False
             for p in permutations(chain, len(chain)):
-                print('Inserting 3 to try one of permutations.')
+                if not test:
+                    print('Inserting 3 to try one of permutations.')
                 for par in p:
                     drone.parcels.insert(i, par)
-                print('Permutation:', p)
-                print(len(drone.parcels))
+                if not test:
+                    print('Permutation:', p)
+                    print(len(drone.parcels))
                 self.calculate_total_distance()
                 distance = self.total_distance
                 if distance < previous_distance:
                     better = True
-                    print('Better!')
+                    if not test:
+                        print('Better!')
                     break
                 else:
-                    print('Popping 3 because this perutation did not work.')
+                    if not test:
+                        print('Popping 3 because this perutation did not work.')
                     for _ in range(length):
                         drone.parcels.pop(i)
                 self.calculate_total_distance()
             # Revert
             if not better:
-                print('Reverting because no permutation was better.')
-                print('Amount of parcels before revert:', len(drone.parcels))
+                if not test:
+                    print('Reverting because no permutation was better.')
+                    print('Amount of parcels before revert:', len(drone.parcels))
                 for k in range(len(self.drones)):
                     self.drones[k] = previous_drones[k]
                 self.calculate_total_distance()

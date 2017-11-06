@@ -18,8 +18,10 @@ import plots
 
 # City creation
 city = City()
-city.cload("danpolska.txt")
+#city.cload("danpolska.txt")
 city += Drone(1, 2400, 8, base=city.position)
 
 # Computations
-city.full_simulated_annealing()
+#city.full_simulated_annealing()
+
+city.test_everything()
