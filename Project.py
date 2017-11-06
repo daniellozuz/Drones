@@ -1,19 +1,12 @@
 """This module defines program behaviour.
 
-    A programmer is supposed to provide optimization parameters,
-    instantiate a city, provide it with data, and call appropriate
-    methods to manupulate data and receive results and visualization.
-"""
+    A programmer is supposed to specify the problem using the interface provided in City module."""
 
-
-from random import randint
 
 from City import City
-from common import Position as Pos
+#from common import Position as Pos
 from Drone import Drone
-from Parcel import Parcel
-
-import plots
+#from Parcel import Parcel
 
 
 # City creation

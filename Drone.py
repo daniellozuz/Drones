@@ -11,7 +11,8 @@ class Drone(object):
     """Provides drone implementation."""
 
 
-    def __init__(self, number, max_capacity, max_speed, base=Pos(0, 0), parcels=None, drone_mass=20, max_fuel=5):
+    def __init__(self, number, max_capacity, max_speed, base=Pos(0, 0),
+                 parcels=None, drone_mass=20, max_fuel=5):
         self.position = base
         self.number = number
         self.mass = drone_mass
@@ -96,6 +97,7 @@ class Drone(object):
             distance = dist(self.position, parcel.position)
             self.position = parcel.position
             velocity = self.speed
+            # TODO include wind.
             time = distance / velocity
             fuel_cost = self.fuel_consumption * time
             self.fuel -= fuel_cost
@@ -122,6 +124,7 @@ class Drone(object):
             distance = dist(position, parcel.position)
             position = parcel.position
             velocity = self.speed
+            # TODO include wind.
             time = distance / velocity
             total_time += time
             fuel_cost = self.fuel_consumption * time
