@@ -65,10 +65,12 @@ class Drone(object):
         """Calculate fuel consumption according to drone's state."""
         return self.base_fuel_consumption * e ** ((self.fuel + self.used_capacity) / self.mass)
 
+
     @property
     def total_time(self):
         """Calculate everything inside this function, then separate it into a few if possible."""
         self.used_capacity = 0
+        total_time = 0
         self.fuel = self.max_fuel
         self.position = self.base
         self.cargo = []
@@ -106,6 +108,7 @@ class Drone(object):
                 return False
         distance = dist(self.position, self.base)
         velocity = self.speed
+        # TODO include wind.
         time = distance / velocity
         fuel_cost = self.fuel_consumption * time
         if self.fuel < 0:
@@ -132,6 +135,7 @@ class Drone(object):
             self.used_capacity -= parcel.weight
         distance = dist(position, self.base)
         velocity = self.speed
+        # TODO include wind.
         time = distance / velocity
         total_time += time
         fuel_cost = self.fuel_consumption * time

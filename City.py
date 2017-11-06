@@ -27,7 +27,8 @@ class City():
     """Main interface with the data."""
 
 
-    def __init__(self, position=Pos(0, 0), wind=(0, 0)):
+    def __init__(self, position=Pos(0, 0), wind=(0, 0), metric='simple'):
+        self.metric = metric
         self.scale = 1000
         self.solution = None
         self.position = position
@@ -162,9 +163,12 @@ class City():
 
 
     def calculate_total_distance(self):
-        """Returns total distance covered by drones."""
+        """Returns total distance or time covered by drones (depending on metric used)."""
         # TODO Replace distance with time (distance tends to assign most parcels to single drone).
-        self.total_distance = sum(drone.path_length for drone in self.drones)
+        if self.metric == 'simple':
+            self.total_distance = sum(drone.path_length for drone in self.drones)
+        if self.metric == 'total_time':
+            self.total_distance = sum(drone.total_time for drone in self.drones)
 
 
     def test_everything(self, cooling_rate=0.99):
