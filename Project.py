@@ -24,4 +24,4 @@ city += Drone(1, 2400, 8, base=city.position)
 # Computations
 #city.full_simulated_annealing()
 
-city.test_everything()
+city.test_everything(cooling_rate=0.999)
