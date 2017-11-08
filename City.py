@@ -6,15 +6,14 @@
         - numerical computations - rearranging parcels among drones and recalculating results."""
 
 
+import datetime
+import json
+import os
 from copy import deepcopy
 from itertools import permutations
-import json
-import math
+from math import cos, radians, sqrt, inf, e
 from random import choice, randint, random, randrange, betavariate, sample
-import os
 from statistics import mean
-from math import cos, radians
-import datetime
 
 from common import Position as Pos
 from common import dist
@@ -36,7 +35,7 @@ class City():
         self.drones = []
         self.parcels = []
         self.total_distance = 0
-        self.best_total_distance = math.inf
+        self.best_total_distance = inf
         # XXX list(accumulate(best_total_distances, min)) - similar?
         self.total_distances = {'accepted' : [],
                                 'attempted' : [],
@@ -230,13 +229,13 @@ class City():
             xxx = 0
         previous_drones = [deepcopy(drone) for drone in self.drones]
         previous_distance = self.total_distance
-        amount = max(xxx, int(math.sqrt(math.sqrt(temperature)) - 3))
+        amount = max(xxx, int(sqrt(sqrt(temperature)) - 3))
         self.stats['random_reinsertions_between_drones'].append(amount)
         self.randomly_reinsert_parcels_between_drones(amount)
-        amount = max(xxx, int(math.sqrt(math.sqrt(temperature)) - 2))
+        amount = max(xxx, int(sqrt(sqrt(temperature)) - 2))
         self.stats['random_reinsertions_in_a_drone'].append(amount)
         self.randomly_reinsert_parcels_in_a_drone(amount)
-        amount = max(xxx, int(math.sqrt(math.sqrt(temperature))))
+        amount = max(xxx, int(sqrt(sqrt(temperature))))
         self.stats['adjacent_swaps'].append(amount)
         self.swap_two_adjacent(amount)
         amount = 1
@@ -249,10 +248,9 @@ class City():
         self.total_distances['attempted'].append(self.total_distance)
         if self.total_distance < self.best_total_distance:
             self.best_total_distance = self.total_distance
-        exponent = 10 * len(self.parcels) * (previous_distance - self.total_distance) / (temperature * self.scale)
-        if exponent > 100:
-            exponent = 100
-        weird_value = math.e ** exponent
+        improvement = previous_distance - self.total_distance
+        exponent = min(100, 10 * len(self.parcels) * improvement / (temperature * self.scale))
+        weird_value = e ** exponent
         if not test:
             print('Weird value:', weird_value)
         if weird_value > random():
@@ -292,7 +290,7 @@ class City():
 
     def get_closest_neighbour_info(self, selected_parcel):
         """Returns selected_parcel's closest neighbour and drone to which it belonged."""
-        closest_distance = math.inf
+        closest_distance = inf
         for drone in self.drones:
             for neighbour in drone.parcels:
                 if neighbour != selected_parcel:

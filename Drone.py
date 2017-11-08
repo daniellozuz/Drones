@@ -1,5 +1,8 @@
 """Provides drone implementation."""
 
+# TODO implement interface for external specification of drone parameters, that is:
+# formulae/discrete characteristics of fuel_consumption or max_speed.
+
 
 from math import e
 from common import Position as Pos
@@ -69,6 +72,8 @@ class Drone(object):
     @property
     def total_time(self):
         """Calculate everything inside this function, then separate it into a few if possible."""
+        # TODO add constant time of landing / starting / refuelling-preparing to flight.
+        # (where? included in fuel_consumption? - is_possible or trip_time or total_time)
         self.used_capacity = 0
         total_time = 0
         self.fuel = self.max_fuel
@@ -99,7 +104,7 @@ class Drone(object):
             distance = dist(self.position, parcel.position)
             self.position = parcel.position
             velocity = self.speed
-            # TODO include wind.
+            # TODO include wind and reloading/preparing times.
             time = distance / velocity
             fuel_cost = self.fuel_consumption * time
             self.fuel -= fuel_cost
@@ -108,7 +113,7 @@ class Drone(object):
                 return False
         distance = dist(self.position, self.base)
         velocity = self.speed
-        # TODO include wind.
+        # TODO include wind and reloading/preparing times.
         time = distance / velocity
         fuel_cost = self.fuel_consumption * time
         if self.fuel < 0:
@@ -127,7 +132,7 @@ class Drone(object):
             distance = dist(position, parcel.position)
             position = parcel.position
             velocity = self.speed
-            # TODO include wind.
+            # TODO include wind and reloading/preparing times.
             time = distance / velocity
             total_time += time
             fuel_cost = self.fuel_consumption * time
@@ -135,7 +140,7 @@ class Drone(object):
             self.used_capacity -= parcel.weight
         distance = dist(position, self.base)
         velocity = self.speed
-        # TODO include wind.
+        # TODO include wind and reloading/preparing times.
         time = distance / velocity
         total_time += time
         fuel_cost = self.fuel_consumption * time
@@ -161,5 +166,5 @@ class Drone(object):
     def path_length(self):
         """Get recalculated path length."""
         path = self.path
-        # Consider using itertools pairwise function
+        # XXX Consider using itertools pairwise function / tee generator.
         return sum(dist(point1, point2) for point1, point2 in zip(path[:-1], path[1:]))
