@@ -105,7 +105,8 @@ class City():
 
 
     def cload(self, coord_file_name):
-        """Loads data from GPS coordinates. The solutions are approximate due to conversion to xy coordinates."""
+        """Loads data from GPS coordinates. The solutions are approximate due to conversion to
+            xy coordinates."""
         with open(os.path.join("coord_test", coord_file_name)) as coord_file:
             data = coord_file.read().strip('\n')
         self.solution = int(data.split('\n')[0])
@@ -163,7 +164,6 @@ class City():
 
     def calculate_total_distance(self):
         """Returns total distance or time covered by drones (depending on metric used)."""
-        # TODO Replace distance with time (distance tends to assign most parcels to single drone).
         if self.metric == 'simple':
             self.total_distance = sum(drone.path_length for drone in self.drones)
         if self.metric == 'total_time':
@@ -172,11 +172,13 @@ class City():
 
     def test_everything(self, cooling_rate=0.99):
         """Performs simulated annealing for all test cases and creates .txt file with summary."""
+        # TODO save it as CSV maybe? easier plotting for thesis visualization purposes.
         raw_test_cases = [f for f in os.listdir(os.path.join(os.getcwd(), "raw_test"))]
         coord_test_cases = [f for f in os.listdir(os.path.join(os.getcwd(), "coord_test"))]
         test_cases = raw_test_cases + coord_test_cases
         print(test_cases)
-        with open(os.path.join("test_results", datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S.txt')), 'w') as result_file:
+        test_file_name = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S.txt')
+        with open(os.path.join("test_results", test_file_name, 'w')) as result_file:
             result_file.write('\t'.join(['Test case', 'Result', 'Sol', 'Overshoot\n']))
             for test_case in test_cases:
                 print("Testing", test_case)
@@ -188,10 +190,12 @@ class City():
                 print(test_case, round(self.total_distance), self.solution)
                 overshoot = round(100 * (self.total_distance - self.solution) / self.solution)
                 print('Overshoot', overshoot, '%')
-                result_file.write('\t'.join([test_case, str(round(self.total_distance)), str(self.solution), str(overshoot) + '%\n']))
+                result_file.write('\t'.join([test_case, str(round(self.total_distance)),
+                                             str(self.solution), str(overshoot) + '%\n']))
 
 
-    def full_simulated_annealing(self, initial_temperature=1000, final_temperature=0.1, cooling_rate=0.9997, test=False):
+    def full_simulated_annealing(self, initial_temperature=1000, final_temperature=0.1,
+                                 cooling_rate=0.9997, test=False):
         """Loops over sim annealing."""
         self.prepare_algorithm()
         if not test:
@@ -203,7 +207,8 @@ class City():
         while temperature > final_temperature:
             self.simulated_annealing(temperature, test=test)
             if not test:
-                print('Now', round(self.total_distance), 'Before', round(prev), 'Best', round(prev_best), 'Temp', temperature, '\n')
+                print('Now', round(self.total_distance), 'Before', round(prev), 'Best',
+                      round(prev_best), 'Temp', temperature, '\n')
             temperature *= cooling_rate
             prev = self.total_distance
             if self.total_distance < prev_best:
@@ -302,7 +307,8 @@ class City():
 
 
     def catch_neighbour_chain(self, max_length):
-        """Reinserts chain of parcels (maximum max_length parcels) from one drone to another, preserving order - reversing or not."""
+        """Reinserts chain of parcels (maximum max_length parcels) from one drone to another,
+            preserving order - reversing or not."""
         # TODO needs major refactoring.
         selected_drone = choice(self.drones)
         neighbour = choice(self.drones)
@@ -313,7 +319,8 @@ class City():
         parcel_chain = []
         direction = randint(0, 1)
         amount = 0
-        while len(neighbour.parcels) - 1 >= neighbour_parcel_index and amount <= max_length and amount <= len(neighbour.parcels):
+        while len(neighbour.parcels) - 1 >= neighbour_parcel_index and amount <= max_length and\
+                amount <= len(neighbour.parcels):
             parcel_chain.append(neighbour.parcels[neighbour_parcel_index])
             neighbour.parcels.pop(neighbour_parcel_index)
             neighbour_parcel_index -= direction
@@ -350,7 +357,8 @@ class City():
     def final_sweep(self, length=4, test=False):
         """Performs final optimization (selects length points in series and selects their best
         ordering), repeated for all points."""
-        # TODO Should not randomly choose index, instead it should go through every index in drone. If drone has less than length parcels it should devour what is available.
+        # TODO Should not randomly choose index, instead it should go through every index in drone.
+        # If drone has less than length parcels it should devour what is available.
         for drone in self.drones:
             i = choice(range(0, len(drone.parcels) - length))
             previous_drones = [deepcopy(dr) for dr in self.drones]

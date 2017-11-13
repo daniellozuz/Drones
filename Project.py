@@ -11,7 +11,7 @@ from Parcel import Parcel
 
 # City creation
 city = City(metric='simple')
-city.rload("djibouti38.txt")
+city.rload("a280.txt")
 city += Drone(1, 2400, 8, base=city.position)
 
 # Computations
