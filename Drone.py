@@ -15,7 +15,7 @@ class Drone(object):
 
 
     def __init__(self, number, max_capacity, max_speed, base=Pos(0, 0),
-                 parcels=None, drone_mass=20, max_fuel=5, wind=(0,0)):
+                 parcels=None, drone_mass=20, max_fuel=5, wind=(0, 0)):
         self.position = base
         self.number = number
         self.mass = drone_mass
@@ -126,6 +126,7 @@ class Drone(object):
         """Calculate speed with respect to the ground (due to wind and flight direction)."""
         W = sqrt(self.wind[0] ** 2 + self.wind[1] ** 2)
         V = self.speed
+        assert V > W, "Wind is too strong."
         x = pos1[0] - pos0[0]
         y = pos1[1] - pos0[1]
         a1 = atan2(y, x)

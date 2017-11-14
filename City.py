@@ -357,6 +357,8 @@ class City():
     def final_sweep(self, length=4, test=False):
         """Performs final optimization (selects length points in series and selects their best
         ordering), repeated for all points."""
+        if self.metric != 'Simple': # XXX change it!
+            return
         # TODO Should not randomly choose index, instead it should go through every index in drone.
         # If drone has less than length parcels it should devour what is available.
         for drone in self.drones:
