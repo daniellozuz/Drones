@@ -4,7 +4,7 @@
 # formulae/discrete characteristics of fuel_consumption or max_speed.
 
 
-from math import e
+from math import e, sqrt, sin, cos, atan2
 from common import Position as Pos
 from common import dist
 from Parcel import Parcel
@@ -15,7 +15,7 @@ class Drone(object):
 
 
     def __init__(self, number, max_capacity, max_speed, base=Pos(0, 0),
-                 parcels=None, drone_mass=20, max_fuel=5):
+                 parcels=None, drone_mass=20, max_fuel=5, wind=(0,0)):
         self.position = base
         self.number = number
         self.mass = drone_mass
@@ -30,6 +30,7 @@ class Drone(object):
         if parcels is None:
             parcels = []
         self.parcels = parcels
+        self.wind = wind
 
 
     def __add__(self, parcels):
@@ -102,9 +103,9 @@ class Drone(object):
         self.fuel = self.max_fuel
         for parcel in self.cargo:
             distance = dist(self.position, parcel.position)
+            velocity = self.absolute_speed(self.position, parcel.position)
+            # include wind and reloading/preparing times. TODO check it.
             self.position = parcel.position
-            velocity = self.speed
-            # TODO include wind and reloading/preparing times.
             time = distance / velocity
             fuel_cost = self.fuel_consumption * time
             self.fuel -= fuel_cost
@@ -112,13 +113,25 @@ class Drone(object):
             if self.fuel < 0:
                 return False
         distance = dist(self.position, self.base)
-        velocity = self.speed
-        # TODO include wind and reloading/preparing times.
+        velocity = self.absolute_speed(self.position, self.base)
+        # include wind and reloading/preparing times. TODO check it.
         time = distance / velocity
         fuel_cost = self.fuel_consumption * time
         if self.fuel < 0:
             return False
         return True
+
+
+    def absolute_speed(self, pos0, pos1):
+        """Calculate speed with respect to the ground (due to wind and flight direction)."""
+        W = sqrt(self.wind[0] ** 2 + self.wind[1] ** 2)
+        V = self.speed
+        x = pos1[0] - pos0[0]
+        y = pos1[1] - pos0[1]
+        a1 = atan2(y, x)
+        a2 = atan2(self.wind[1], self.wind[0])
+        alpha = abs(a2 - a1)
+        return W * cos(alpha) + sqrt(V ** 2 - W ** 2 * sin(alpha) ** 2)
 
 
     def trip_time(self, cargo):
@@ -130,17 +143,17 @@ class Drone(object):
         self.fuel = self.max_fuel
         for parcel in cargo:
             distance = dist(position, parcel.position)
+            velocity = self.absolute_speed(self.position, parcel.position)
             position = parcel.position
-            velocity = self.speed
-            # TODO include wind and reloading/preparing times.
+            # include wind and reloading/preparing times. TODO check it.
             time = distance / velocity
             total_time += time
             fuel_cost = self.fuel_consumption * time
             self.fuel -= fuel_cost
             self.used_capacity -= parcel.weight
         distance = dist(position, self.base)
-        velocity = self.speed
-        # TODO include wind and reloading/preparing times.
+        velocity = self.absolute_speed(self.position, self.base)
+        # include wind and reloading/preparing times. TODO check it.
         time = distance / velocity
         total_time += time
         fuel_cost = self.fuel_consumption * time
