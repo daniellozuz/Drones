@@ -15,7 +15,7 @@ class Drone(object):
 
 
     def __init__(self, number, max_capacity, max_speed, base=Pos(0, 0),
-                 parcels=None, drone_mass=20, max_fuel=5, wind=(0, 0)):
+                 parcels=None, drone_mass=20, max_fuel=5, wind=(0, 0), loading_time=5):
         self.position = base
         self.number = number
         self.mass = drone_mass
@@ -31,6 +31,7 @@ class Drone(object):
             parcels = []
         self.parcels = parcels
         self.wind = wind
+        self.loading_time = loading_time # Rising + falling + refuelling + maintenance + reloading
 
 
     def __add__(self, parcels):
@@ -106,7 +107,7 @@ class Drone(object):
             velocity = self.absolute_speed(self.position, parcel.position)
             # include wind and reloading/preparing times. TODO check it.
             self.position = parcel.position
-            time = distance / velocity
+            time = distance / velocity + self.loading_time
             fuel_cost = self.fuel_consumption * time
             self.fuel -= fuel_cost
             self.used_capacity -= parcel.weight
@@ -115,7 +116,7 @@ class Drone(object):
         distance = dist(self.position, self.base)
         velocity = self.absolute_speed(self.position, self.base)
         # include wind and reloading/preparing times. TODO check it.
-        time = distance / velocity
+        time = distance / velocity + self.loading_time
         fuel_cost = self.fuel_consumption * time
         if self.fuel < 0:
             return False
@@ -147,7 +148,7 @@ class Drone(object):
             velocity = self.absolute_speed(self.position, parcel.position)
             position = parcel.position
             # include wind and reloading/preparing times. TODO check it.
-            time = distance / velocity
+            time = distance / velocity + self.loading_time
             total_time += time
             fuel_cost = self.fuel_consumption * time
             self.fuel -= fuel_cost
@@ -155,7 +156,7 @@ class Drone(object):
         distance = dist(position, self.base)
         velocity = self.absolute_speed(self.position, self.base)
         # include wind and reloading/preparing times. TODO check it.
-        time = distance / velocity
+        time = distance / velocity + self.loading_time
         total_time += time
         fuel_cost = self.fuel_consumption * time
         return total_time
