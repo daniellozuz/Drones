@@ -8,14 +8,15 @@ from math import e, sqrt, sin, cos, atan2
 from common import Position as Pos
 from common import dist
 from Parcel import Parcel
+from random import randrange
 
 
 class Drone(object):
     """Provides drone implementation."""
 
 
-    def __init__(self, number, max_capacity, max_speed, base=Pos(0, 0),
-                 parcels=None, drone_mass=20, max_fuel=5, wind=(0, 0), loading_time=5):
+    def __init__(self, number, max_capacity, max_speed, base=Pos(0, 0), parcels=None,
+                 drone_mass=20, max_fuel=5, wind=(0, 0), loading_time=5, base_fuel_consumption=0.001):
         self.position = base
         self.number = number
         self.mass = drone_mass
@@ -24,7 +25,7 @@ class Drone(object):
         self.max_speed = max_speed
         self.max_fuel = max_fuel
         self.fuel = max_fuel
-        self.base_fuel_consumption = 0.001
+        self.base_fuel_consumption = base_fuel_consumption
         self.base = base
         self.cargo = []
         if parcels is None:
@@ -92,6 +93,16 @@ class Drone(object):
         total_time += time
         self.cargo = []
         return total_time
+
+
+    def twoopt(self):
+        """Performs a 2-opt modification of parcels."""
+        i, k = sorted([randrange(len(self.parcels)), randrange(len(self.parcels))])
+        new_parcels = []
+        new_parcels.extend(self.parcels[:i])
+        new_parcels.extend(reversed(self.parcels[i:k]))
+        new_parcels.extend(self.parcels[k:])
+        self.parcels = new_parcels
 
 
     def is_possible(self):

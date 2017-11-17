@@ -9,26 +9,26 @@ from Drone import Drone
 from Parcel import Parcel
 
 
-# # City creation
-# city = City(metric='simple')
-# city.rload("a280.txt")
-# city += Drone(1, 2400, 8, base=city.position)
+# City creation
+city = City(metric='simple')
+city.rload("djibouti38.txt")
+city += Drone(1, 2400, 8, base=city.position)
 
-# # Computations
+# Computations
+city.full_simulated_annealing(cooling_rate=0.9997, initial_temperature=10, final_temperature=0.001)
+
+#city.test_everything(cooling_rate=0.9)
+
+
+
+
+# city = City(metric='total_time')
+# city += Parcel(1, 6, Pos(1000, 0))
+# city += Parcel(2, 6, Pos(-1000, 0))
+# city += Parcel(3, 2, Pos(1100, 100))
+# city += Parcel(4, 2, Pos(-1100, 100))
+# city += Drone(1, 10, 10)
+# city += Drone(2, 10, 10)
+# city.store('test1.txt')
+
 # city.full_simulated_annealing()
-
-# #city.test_everything(cooling_rate=0.9)
-
-
-
-
-city = City(metric='total_time')
-city += Parcel(1, 6, Pos(1000, 0))
-city += Parcel(2, 6, Pos(-1000, 0))
-city += Parcel(3, 2, Pos(1100, 100))
-city += Parcel(4, 2, Pos(-1100, 100))
-city += Drone(1, 10, 10)
-city += Drone(2, 10, 10)
-city.store('test1.txt')
-
-city.full_simulated_annealing()

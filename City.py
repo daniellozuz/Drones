@@ -159,7 +159,8 @@ class City():
         max_y = max([parcel.position.y for parcel in self.parcels])
         min_x = min([parcel.position.x for parcel in self.parcels])
         min_y = min([parcel.position.y for parcel in self.parcels])
-        self.scale = max(max_x - min_x, max_y - min_y)
+        self.scale = max(max_x - min_x, max_y - min_y) # XXX why the division?
+        # XXX Probably due to modification function parameters.
 
 
     def calculate_total_distance(self):
@@ -234,27 +235,14 @@ class City():
             xxx = 0
         previous_drones = [deepcopy(drone) for drone in self.drones]
         previous_distance = self.total_distance
-        amount = max(xxx, int(sqrt(sqrt(temperature)) - 3))
-        self.stats['random_reinsertions_between_drones'].append(amount)
-        self.randomly_reinsert_parcels_between_drones(amount)
-        amount = max(xxx, int(sqrt(sqrt(temperature)) - 2))
-        self.stats['random_reinsertions_in_a_drone'].append(amount)
-        self.randomly_reinsert_parcels_in_a_drone(amount)
-        amount = max(xxx, int(sqrt(sqrt(temperature))))
-        self.stats['adjacent_swaps'].append(amount)
-        self.swap_two_adjacent(amount)
-        amount = 1
-        self.stats['neighbour_swallowings'].append(amount)
-        self.swallow_neighbour()
-        amount = int(len(self.parcels) * betavariate(1, 5))
-        self.stats['neighbour_chain_lengths'].append(amount)
-        self.catch_neighbour_chain(amount)
+        drone = choice(self.drones)
+        drone.twoopt()
         self.calculate_total_distance()
         self.total_distances['attempted'].append(self.total_distance)
         if self.total_distance < self.best_total_distance:
             self.best_total_distance = self.total_distance
         improvement = previous_distance - self.total_distance
-        exponent = min(100, 10 * len(self.parcels) * improvement / (temperature * self.scale))
+        exponent = min(100, improvement / (temperature * self.scale))
         weird_value = e ** exponent
         if not test:
             print('Weird value:', weird_value)
