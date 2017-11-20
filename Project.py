@@ -7,17 +7,20 @@ from City import City
 from common import Position as Pos
 from Drone import Drone
 from Parcel import Parcel
+import plots
 
 
 # City creation
 city = City(metric='simple')
-city.rload("djibouti38.txt")
+#city.rload("a280.txt")
 city += Drone(1, 2400, 8, base=city.position)
 
 # Computations
-city.full_simulated_annealing(cooling_rate=0.9997, initial_temperature=10, final_temperature=0.001)
+#city.full_simulated_annealing(cooling_rate=0.9997, initial_temperature=10, final_temperature=0.001)
 
-#city.test_everything(cooling_rate=0.9)
+city.test_everything(cooling_rate=0.97, initial_temperature=10000, final_temperature=1)
+city.test_everything(cooling_rate=0.97, initial_temperature=100, final_temperature=0.01)
+plots.show_test_results()
 
 
 

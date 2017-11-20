@@ -14,6 +14,7 @@ from itertools import permutations
 from math import cos, radians, sqrt, inf, e
 from random import choice, randint, random, randrange, betavariate, sample
 from statistics import mean
+import csv
 
 from common import Position as Pos
 from common import dist
@@ -171,28 +172,31 @@ class City():
             self.total_distance = max(drone.total_time for drone in self.drones)
 
 
-    def test_everything(self, cooling_rate=0.99):
+    def test_everything(self, cooling_rate=0.99, initial_temperature=1000, final_temperature=0.1):
         """Performs simulated annealing for all test cases and creates .txt file with summary."""
-        # TODO save it as CSV maybe? easier plotting for thesis visualization purposes.
         raw_test_cases = [f for f in os.listdir(os.path.join(os.getcwd(), "raw_test"))]
         coord_test_cases = [f for f in os.listdir(os.path.join(os.getcwd(), "coord_test"))]
         test_cases = raw_test_cases + coord_test_cases
         print(test_cases)
-        test_file_name = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S.txt')
-        with open(os.path.join("test_results", test_file_name, 'w')) as result_file:
-            result_file.write('\t'.join(['Test case', 'Result', 'Sol', 'Overshoot\n']))
+        test_file_name = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S.csv')
+        with open(os.path.join("test_results", test_file_name), 'w', newline='') as result_file:
+            csvwriter = csv.writer(result_file)
+            csvwriter.writerow(['cooling_rate', 'initial_temperature', 'final_temperature'])
+            csvwriter.writerow([cooling_rate, initial_temperature, final_temperature])
+            csvwriter.writerow(['test_case', 'result', 'solution', 'overshoot'])
             for test_case in test_cases:
                 print("Testing", test_case)
                 if test_case in raw_test_cases:
                     self.rload(test_case)
                 if test_case in coord_test_cases:
                     self.cload(test_case)
-                self.full_simulated_annealing(cooling_rate=cooling_rate, test=True)
+                self.full_simulated_annealing(cooling_rate=cooling_rate, initial_temperature=1000,
+                                              final_temperature=0.1, test=True)
                 print(test_case, round(self.total_distance), self.solution)
                 overshoot = round(100 * (self.total_distance - self.solution) / self.solution)
                 print('Overshoot', overshoot, '%')
-                result_file.write('\t'.join([test_case, str(round(self.total_distance)),
-                                             str(self.solution), str(overshoot) + '%\n']))
+                csvwriter.writerow([test_case, str(round(self.total_distance)),
+                                    str(self.solution), str(overshoot)])
 
 
     def full_simulated_annealing(self, initial_temperature=1000, final_temperature=0.1,
@@ -229,7 +233,7 @@ class City():
 
     def simulated_annealing(self, temperature, test=False):
         """Performs one iteration of simulated annealing algorithm."""
-        # TODO needs major refactoring.
+        # XXX needs major refactoring.
         xxx = 1
         if len(self.drones) == 1:
             xxx = 0
@@ -271,7 +275,7 @@ class City():
     def swallow_neighbour(self):
         """Insert closest neighbour into path before or after selected parcel."""
         to_drone = choice(self.drones)
-        # TODO change it!
+        # XXX change it!
         if len(to_drone.parcels) < 1:
             return
         selected_parcel_index = randrange(0, len(to_drone.parcels))
@@ -297,7 +301,7 @@ class City():
     def catch_neighbour_chain(self, max_length):
         """Reinserts chain of parcels (maximum max_length parcels) from one drone to another,
             preserving order - reversing or not."""
-        # TODO needs major refactoring.
+        # XXX needs major refactoring.
         selected_drone = choice(self.drones)
         neighbour = choice(self.drones)
         if not neighbour.parcels or not selected_drone.parcels:
@@ -347,7 +351,7 @@ class City():
         ordering), repeated for all points."""
         if self.metric != 'Simple': # XXX change it!
             return
-        # TODO Should not randomly choose index, instead it should go through every index in drone.
+        # XXX Should not randomly choose index, instead it should go through every index in drone.
         # If drone has less than length parcels it should devour what is available.
         for drone in self.drones:
             i = choice(range(0, len(drone.parcels) - length))
