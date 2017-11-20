@@ -1,0 +1,333 @@
+\documentclass[twoside, 12pt]{article}
+\usepackage[top=2cm, bottom=2cm, inner=2cm, outer=3cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\usepackage[usenames, dvipsnames]{color}
+\usepackage{lipsum}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+\usepackage{caption}
+\captionsetup[table]{name=Tabela}
+\captionsetup[figure]{name=Rysunek}
+\usepackage{mathtools}
+
+
+
+
+\title{Titlepage}
+\author{Daniel Zuziak}
+
+\begin{document}
+
+\maketitle
+\newpage
+
+
+
+Strona tytułowa cz. 2
+\newpage
+
+
+
+\section{STRESZCZENIE PRACY INŻYNIERSKIEJ.}
+\textcolor{red}{Napisać streszczenie po ang, polskie nie jest potrzebne.}
+\newpage
+
+
+
+\section{CEL PRACY INŻYNIERSKIEJ.}
+\par Celem pracy inżynierskiej jest opracowanie algorytmu przybliżonego dla 3-wymiarowego problemu marszrutyzacji oraz jego implementacja. Zastosowanym algorytmem jest algorytm symulowanego wyżarzania, opracowany w środowisku Python. Problemem jest optymalizacja trasy dronu lub floty dronów. Beneficjentem programu jest fikcyjna firma kurierska świadcząca usługi na terenie miasta Krakowa. Miasto zostało wybrane ze względu na nadanie fizycznego znaczenia rozważanemu problemowi oraz cechy potencjalnie wpływające na postać problemu. Jest ono rozważane hipotetycznie, gdyż obecne uwarunkowania prawne nie pozwalają zastosować niniejszego rozwiązania nad terenem miasta. Model umożliwia specyfikację zadania w postaci prostego skryptu w języku Python. Program ma za zadanie wyliczyć możliwie najlepszą trasę dronów pomiędzy zadanymi punktami dostawy. Uwzględni on konfigurowalne z poziomu skryptu parametry środowiska (miasta Krakowa) oraz specyfikę przybliżonego modelu dronów. Sam algorytm dostosowano do specyfiki niniejszego zagadnienia. W zależności od specyfiki problemu możemy wybrać jedną z dwóch zaimplementowanych metryk. Uwzględniono odpowiednie metryki pomiaru kosztu oraz zestaw procedur modyfikujących trasę, celem ich optymalizacji. Przebieg działania algorytmu jest monitorowany w postaci reprezentacji graficznej, a końcowe rozwiązanie prezentowane razem z charakterystyką przebiegu optymalizacji. Kolejne rozwiązywane problemy są archiwizowane, dzięki czemu można przeprowadzić szereg testów, których celem jest odpowiedni dobór parametrów algorytmu w zależności od klasy typowych problemów. Testy uwzględniają także przypadki, w których znane jest rozwiązanie optymalne.
+\newpage
+
+
+
+\section{ZAŁOŻENIA PROJEKTU.}
+\textcolor{red}{Trochę zmienić formę – założenia od razu przedstawiać a nie w podsumowaniu.}
+
+
+\subsection{Słownik pojęć.}
+\textcolor{red}{Wprowadzić zagadnienia z VRP – bardziej oficjalne techniczne nazwy.}
+\par Firma kurierska – podmiot będący w posiadaniu floty dronów świadczący usługi kurierskie, beneficjent aplikacji.
+\par Przesyłka – obiekt, który ma zostać przetransportowany z bazy do punktu dostawy za pomocą dronu.
+\par Strefa zabroniona – strefa w obrębie obszaru osiągalnego przez drony wyłączona z ruchu powietrznego dronów.
+
+\begin{table}[h]
+	\centering
+		\begin{tabular}{|l|l|p{7cm}|}
+		\hline Tutaj & VRP & Opis\\
+		\hline Dron & Pojazd & statek powietrzny spalinowy, wykonujący usługi dostarczania przesyłek do punktów dostawy\\
+		\hline Punkt dostawy & Klient / Punkt & miejsce docelowe, w które należy dostarczyć przesyłkę\\
+		\hline Baza & Baza & miejsce punktu startowego oraz powrotu dronów\\
+		\hline
+	\end{tabular}
+	\caption{Słownik pojęć.}
+\end{table}
+
+\textcolor{red}{CVRP - problem marszrutyzacji:
+VRP + Dodatkowo nieprzekroczenie pojemności środka transportu.
+Dodatkowe założenia:
+- niesymetryczność kosztów przewozu pomiędzy wierzchołkami
+- niehomogeniczność taboru
+- ograniczenie maksymalnej długości trasy
+-  przejazdy drobnicowe (Less Than Truckload)??
+- możliwość obsługi jednego klienta przez kilka pojazdów (Split Delivery VRP)
+- w których kosztowa funkcja celu zastąpiona została innymi parametrami (np. czas wykonania zleceń, długość tras, ilość przewiezionego ładunku) 
+}
+
+\par Obszar pracy:
+\par Obszar pracy dronów i jego charakterystyka jest trudna do przewidzenia i niezwykle złożona, gdyby chcieć ją przedstawić dokładnie (zabudowania, wiatr itp.). Z tego względu model przewiduje szereg parametrów przybliżających specyfikę środowiska, w którym drony mają latać. Służy to zredukowaniu złożoności modelu, model jest tak czy siak liczony algorytmem przybliżonym, więc małe uproszczenia nie powinny mieć wpływu na rozwiązanie. Zapewnienie bezpiecznego przelotu (brak wypadków) i omijanie przeszkód, stabilizacja lotu dronu itp. jest zadaniem oprogramowania obecnego w dronie.
+\par Jak oszacować długość trasy:
+\par Ze względu na charakterystykę obszaru pracy, możemy rozważyć dwie kategorie sposobu szacowania trasy:
+- ruch pomiędzy zdefiniowanymi punktami w linii prostej (metryka euklidesowa)
+- metryka taksówkowa – pozostawiająca możliwość doboru trasy
+Metryka taksówkowa pozwala na dobór dokładnej trasy bez zmiany jej kosztu. Jest ona uzasadniona w przypadku miast bardzo wysoko i gęsto zabudowanych. 
+Metryka euklidesowa – jej zaletą jest dokładność oszacowania kosztu trasy (najkrótsza możliwa trasa w przestrzeni). Jednakże jej wadą, jest fakt, iż może być niedokładna ze względu na potencjalne dodatkowe nakłady związane z omijaniem przeszkód (ukształtowanie terenu, zabudowania). 
+\par Wysokość przelotowa (pułap):
+\par Możliwość wprowadzenia pojęcia pułapu przelotowego pozwala na zastosowanie metryki euklidesowej w obszarach miast (omijanie budynków górą i lot w linii prostej). Zmieniając wysokość pułapu uzyskujemy coraz to inne charakterystyki obszaru roboczego. Im większy pułap przelotowy tym mniejsza ilość budynków na drodze dronu, a tym samym większa dokładność zastosowania metryki euklidesowej.
+Model programowy pozwala na zastosowanie jednej z dwóch wybranych metryk, a także zdefiniowanie pułapu przelotowego. Te parametry są specyficzne dla konkretnego miasta, więc powinny być oszacowane dla konkretnego zastosowania. W kolejnym podpunkcie rozważymy dobór tychże parametrów na przykładzie miasta Krakowa.
+
+
+
+\subsection{Aspekty geograficzne.}
+\par Terenem rozpatrywanym jako obszar działalności potencjalnej firmy kurierskiej jest miasto Kraków. Rysunek \ref{fig:granice} przedstawia mapę miasta, jego granice wyznacza fioletowa linia.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=15cm]{granice_Krakowa}.
+	\caption{Granice miasta Krakowa.\label{fig:granice}}
+\end{figure}
+
+\par Obrys granic Krakowa definiuje nam wielkość obszaru, po której wstępnie przewidujemy ruch powietrzny dronów. Wartości charakteryzujące wielkość miasta Kraków przedstawione są w tabeli \ref{tab:odleglosci}.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{|l|l|}
+		\hline Cecha & Wartość\\
+		\hline Różnica skrajnych odległości w orientacji północ-południe & 18 km\\
+		\hline Różnica skrajnych odległości w orientacji wschód-zachód & 30 km\\
+		\hline Powierzchnia & 326,85 km2\\
+		\hline Wysokość & 188 – 383 m n.p.m.\\
+		\hline
+	\end{tabular}
+	\caption{Charakterystyka miasta Kraków.\label{tab:odleglosci}}
+\end{table}
+
+\par Wielkość miasta ma za zadanie nadać znaczenie i kontekst pojęciu kosztu trasy (czas lub odległość) oraz odpowiadającym im wartościom liczbowym.
+
+
+
+\subsubsection{Wysokość terenu.}
+\par Wysokość terenu w mieście Kraków wacha się od 188 do 393,6 m n.p.m. Zauważalnym jest duże zróżnicowanie wysokości (205 m). Najwyższymi wzniesieniami są Kopiec Piłsudskiego (393,6 m n.p.m.) oraz Kopiec Kościuszki (327 m n.p.m.).
+\par Wartym zauważenia faktem skłaniającym do uproszczenia założeń, jest fakt, iż tereny tychże wzniesień są stosunkowo niewielkie i mało zaludnione. Małe prawdopodobieństwo przelotu nad wzniesieniami (z powodu braku zaludnienia jak i faktu, iż wzniesienia znajdują się na obrzeżach Krakowa (nie będzie dużo przelotów nad nimi)) pozwala na zaniedbanie wymiaru wysokościowego dla tej części Krakowa z powodu niewielkiego potencjalnego wpływu na rezultat.
+\par Wyłączając obszar obu wzniesień, z powodów opisanych wyżej, maksymalną wysokość nad poziom morza można oszacować na 260 m. W takim obszarze wspomniane zróżnicowanie wysokości zmniejsza się do 72 m.
+\par Oszacowana zmiana wysokości posłuży doborowi odpowiedniego pułapu przelotowego dronów.
+
+\subsubsection{Architektura.}
+\par Lokalizację 10 najwyższych obiektów Krakowa przedstawia rysunek \ref{fig:wiezowce}, natomiast ich wysokość tabela \ref{tab:wiezowce}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=15cm]{lokalizacja_wiezowcow}.
+	\caption{Lokalizacja 10 najwyższych obiektów Krakowa.\label{fig:wiezowce}}
+\end{figure}
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{|l|p{7cm}|}
+		\hline Nazwa & Wysokość [m]\\
+		\hline K1 & 105\\
+		\hline Unity Tower & 102,5\\
+		\hline Dom Wschodzącego Słońca & 65\\
+		\hline Bocianie Gniazdo & 63\\
+		\hline Biprostal & 60\\
+		\hline Quattro Business Park & 62\\
+		\hline Rondo Business Park & 60\\
+		\hline Salwator Tower & 60\\
+		\hline Wieżowiec Kijowska & 55\\
+		\hline Vinci & 55\\
+		\hline
+	\end{tabular}
+	\caption{Najwyższe obiekty Krakowa.\label{tab:wiezowce}}
+\end{table}
+
+\par Jak widać w tabeli \ref{tab:wiezowce}, jedynie dwa wieżowce przekraczają wysokość 70 m, co sugeruje, że budynki o znacznej wysokości pojawiają się na terenie Krakowa bardzo rzadko. Ogólną cechą zabudowań Krakowa jest stosunkowa ich niskość (rzędu 10 – 30 m).
+\par Ponieważ chcemy rozsyłać paczki na terenie całego Krakowa (znacznie większa odległość w poziomie od tej w pionie), trafniejszym doborem metryki okaże się metryka euklidesowa.
+\par Aby jej przekłamanie było niewielkie, pułap należy oszacować na jak największy. Jednakże, aby nie obarczać trasy dronów zbyt dużą karą przyjmijmy wysokość pułapu przelotowego na 70 m. (także zgodne z założeniem o wysokości terenu).
+\par Model uwzględnia fakt, iż dron musi wznieść się na wybrany pułap przelotowy przed rozpoczęciem trasy. Procedura wznoszenia do pułapu i opadania z niego jest uwzględniona w metrykę pomiaru odległości, jako odpowiednia wielokrotność kosztu w porównaniu z ruchem poziomym (ruch w pionie obarczony większym wydatkiem energetycznym).
+
+
+
+\subsubsection{Prędkość wiatru.}
+\par Siła wiatru powyżej 10 m/s przypada średnio na 20 dni w roku. Wartość ta stanowi znaczący ułamek maksymalnej przewidywanej prędkości przelotowej dronu, stąd model uwzględnia wiatr w obliczeniach odpowiednio modyfikując prędkość dronu względem ziemi. 
+\par Z powodu ciężkiej do przewidzenia natury wiatru (siła – podmuchy, jak i kierunek – pozorna zmienność) model aproksymuje prędkość wiatru a także jego kierunek jako stałą wartość, niezmienną w czasie działania algorytmu.
+\par \textcolor{red}{Troszkę to rozbudować. Napisać o cieniu wietrznym, im mniejsza prędkość tym większa zmiana kierunku, brak wpływu kierunku na obliczenia (znoszenie się – stochastyka).}
+
+
+
+\subsection{Aspekty prawne.}
+\par W zależności od specyfiki miasta, należy mieć na uwadze obszary powietrzne zabronione, bądź w jakiś sposób ograniczone. Do takich obszarów mogą należeć: lotniska, tereny rządowe, wojskowe, tereny skażone lub zagrożone w inny sposób (drapieżne ptaki, wulkany, pokemony). Charakterystykę ograniczeń należy rozważać dla konkretnego problemu, poniżej przedstawiamy aspekty prawne na przykładzie miasta Krakowa.
+\par Rysunek \ref{fig:strefy} ukazuje mapę Krakowa wraz z naniesionymi zabronionymi strefami powietrznymi. Na zachodzie ukazana jest strefa powietrzna wynikająca z obecności lotniska Balice – loty linii lotniczych, na wschodzie – obecności lotniska Pobiednik Wielki – lotnisko rekreacyjne aeroklubu Krakowskiego.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=15cm]{Krakow_strefy}.
+	\caption{Strefy powietrzne nad miastem Kraków.\label{fig:strefy}}
+\end{figure}
+
+\par Charakterystyka ukazanych na rysunku \ref{fig:strefy} stref powietrznych jest zebrana w tabeli \ref{tab:strefy}.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{|l|l|p{2.2cm}|p{2.2cm}|p{2.2cm}|p{2.2cm}|}
+		\hline Obszar & Strefa CTR & Granice & Maksymalny pułap & Maksymalna waga & Maksymalna odległość\\
+		\hline Czerwony & Tak & Do 1 km od granicy lotniska & Ruch zabroniony & Ruch zabroniony & Ruch zabroniony\\
+		\hline Jasnoczerwony & Tak & Do 6 km od granicy lotniska & 30 m & 0,6 kg & 100 m\\
+		\hline Pomarańczowy & Tak & Wyznaczane przez strefę dolotową do lotniska & 100 m & 25 kg & W zasięgu wzroku operatora\\
+		\hline Niebieski & Nie & Wyznaczane przez obszar lotniska lub lądowiska & W zasięgu wzroku operatora & Brak ograniczeń & W zasięgu wzroku operatora\\
+		\hline Pozostałe & Nie & Nie dotyczy & W zasięgu wzroku operatora & Brak ograniczeń & W zasięgu wzroku operatora\\
+		\hline
+	\end{tabular}
+	\caption{Charakterystyka stref powietrznych nad Krakowem.\label{tab:strefy}}
+\end{table}
+
+\par Strefa CTR – strefa kontrolowana lotniska. Loty w dostępnej części strefy CTR (patrz tabela \ref{tab:strefy}) wymagają zgłoszenia odpowiedniego wniosku na co najmniej 5 dni przed planowanym lotem oraz uzyskania zgody z Ośrodka Planowania Strategicznego ASM1.
+\par Ośrodek Planowania Strategicznego ASM1 – komitet Polskiej Agencji Żeglugi Powietrznej określający zasady i priorytety użytkowania przestrzeni powietrznej.
+\par Loty w strefie zaznaczonej kolorem niebieskim wymagają zgody zarządzającego obiektem (lotniskiem lub lądowiskiem). 
+\par Loty dzielą się na dwie kategorie:
+\par VLOS – Visual Line of Sight – loty wykonywane w zasięgu wzroku operatora.
+\par BVLOS – Beyond Visual Line of Sight – loty wykonywane poza zasięgiem wzroku operatora.
+\par W przypadku lotu BVLOS należy spełnić następujące kryteria:
+\par - lot musi być wykonywany w prywatnej przestrzeni powietrznej.
+\par - rezerwacja przestrzeni powietrznej na wyłączność – wniosek przyznania wyłączności należy złożyć nie później niż 90 dni przed planowanym przelotem.
+\par Powyższe ograniczenia powodują, że niemożliwym na chwilę obecną jest wykonywanie lotów nad znaczną częścią Krakowa, a nad niewielką częścią Krakowa należącą do przestrzeni powietrznej lotniska Pobiednik – znacznie utrudnione.
+\par Model nie bierze pod uwagę aspektów prawnych dotyczących pozwoleń na przeloty nad terenem Krakowa. Zgodnie z prawem takie przeloty muszą być zgłoszone odpowiednio wcześnie do podmiotów odpowiedzialnych za udzielanie zgód na przelot. Kwestia udzielania zgody na każdy z przelotów pomiędzy punktami dostawy niweczy sens zastosowania dronów jako środka transportu przesyłek. Na dzień dzisiejszy transport taki mógłby odbywać się w trybie wspomnianym w założeniu pierwszym jedynie w przypadku wynajęcia przestrzeni powietrznej na własność. Mimo to miasto Kraków będzie nadal rozważane jako docelowe środowisko zastosowania dronów, pomimo wymienionych aspektów prawnych. Z biegiem czasu prawo dotyczące zasad ruchu dronów z pewnością ulegnie zmianie, potencjalnie umożliwiając zastosowanie niniejszego rozwiązania nad terenem miast.
+
+
+
+\subsection{Aspekty technologiczne}
+
+
+
+\subsubsection{Techniczna charakterystyka dronów.}
+\par Rozważania rozpoczniemy od przeglądu dostępnych na rynku modeli dronów. Rozważono dwie kategorie dronów: elektroniczny oraz spalinowy. Charakterystyka porównawcza została sporządzona w postaci tabeli \ref{tab:drony}.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{|l|p{5.5cm}|p{5.5cm}|}
+		\hline Parametr & Elektryczny & Spalinowy\\
+		\hline Model & DJI Phantom 4 & Incredible HLQ – Heavy Lifting Quadcopter\\
+		\hline Prędkość & 58 mph (93 kmh) & 60 mph (96 kmh)	\\
+		\hline Zasięg & 4.3 mile & Zależy\\
+		\hline Czas lotu & 75 min & zależy  30 min (60 nawet)\\
+		\hline Czas ładowania & 75 min & Nie dotyczy\\
+		\hline Wysokość & 4 mile (6440 m) & Brak danych\\
+		\hline Bateria & 5350 mAh & Nie dotyczy\\
+		\hline Udźwig & Brak danych & 50 pounds (22,5 kg)\\
+		\hline Moc	& Brak danych & 12.5 KM\\
+		\hline Opcje lotu & waypoint, return to home, orbit, follow & waypoint, return to home, orbit, follow\\
+		\hline
+	\end{tabular}
+	\caption{Charakterystyka porównawcza dwóch modeli dronów.\label{tab:drony}}
+\end{table}
+
+\par Parametry opisane w powyższej tabeli ukazują duże podobieństwo dwóch technologii. Opcje lotu ukazują możliwość programowania dronu określoną trasą. Udźwig jak i maksymalna wysokość nie stawia ograniczeń na model.
+\par Największą różnicą jest zdefiniowanie modelu określające zużycie energii na przelot, za czym idzie prędkość oraz udźwig dronu. Ponieważ zakładane odległości znacznie przewyższają możliwości dronu elektrycznego program bazuje na modelu spalinowym. Łatwość zwiększenia maksymalnego zasięgu dronu za pomocą dodatkowego baku paliwa umożliwia dotarcie do każdego punktu w założonym obszarze. Należy też przypuszczać, że podobne zwiększenie możliwości dronu elektrycznego (dodanie dodatkowych ogniw) będzie obarczone nieporównywalnie większym dodatkowym ciężarem (baterie są chyba ciężkie).
+\par Model definiuje charakterystykę prędkości oraz zużycie paliwa.
+\par Ponieważ model definiuje charakterystykę bardziej złożonego dronu spalinowego, możliwe jest przybliżenie charakterystyki dronu elektronicznego, przy założeniu braku ciężaru paliwa i jego zużycia - otrzymujemy wtedy odpowiednik dronu z jedną baterią (lub zestawem baterii opisanym jako sumaryczna masa, nie muszę przecież ich liczyć ani nie pozbędę się ich ciężaru, nie mogę ich tak o wywalić w locie).
+
+
+
+\subsubsection{Parametry konfiguracyjne modelu.}
+\par Model bierze pod uwagę parametry fizyczne dronów spisane w tabeli \ref{tab:parametry_dronow}.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{|l|l|l|l|}
+		\hline Parametr & Ograniczenie dolne & Ograniczenie górne & Typowa wartość parametru (np. stosowana przy testowaniu i szacowaniu działania algorytmu)\\
+		\hline Masa własna dronu [kg] & 0 & 50 & 20\\
+		\hline Udźwig dronu [kg] & 0 & 25 & 10\\
+		\hline Pojemność baku [kg] & 0 & 10 & 5\\
+		\hline Maksymalna prędkość przelotowa (pusty dron) [m/s] & 0 & 20 & 10\\
+		\hline Współczynnik zużycia paliwa [kg/s] & 0 & 0.01 & 0.003\\
+		\hline
+	\end{tabular}
+	\caption{Wartości parametrów dronów.\label{tab:parametry_dronow}}
+\end{table}
+
+\par Parametry podane w tabeli mogą zostać określone dla każdego wyspecyfikowanego dronu z osobna. Ograniczenia nałożone na parametry mają na celu zachowanie sensu fizycznego zadanego problemu. Typowa wartość parametru jest wartością domyślną, jeśli nie zostanie przyjęta wartość jawnie podana przez operatora, wartość domyślna zostanie użyta do obliczeń. Wartości domyślne zostały dobrane na zasadzie oszacowania.
+\par Wartości domyślne są stosowane w przypadkach testowych oceniających działanie algorytmu, służą też samostrojeniu algorytmu.
+
+
+
+\subsubsection{Model zużycia paliwa.}
+\par Zużycie paliwa w jednostce czasu jest zamodelowane następującym wzorem:
+k_{n+1} = n^2 + k_n^2 - k_{n-1}
+\par Gdzie:
+\par c_b – podstawowe zużycie paliwa na sekundę
+\par p – waga paliwa w zbiorniku
+\par q – sumaryczna waga przewożonych ładunków
+\par m – masa własna dronu
+\textcolor{red}{KOSMETYKA: brzydkie indeksy.}
+\par Przybliża on wzrost zużycia paliwa w zależności od całkowitej masy dronu. 
+
+
+
+\subsubsection{Model prędkości dronu.}
+\par Prędkość dronu jest zamodelowana następującym wzorem:
+
+\par Gdzie:
+\par V_max – maksymalna prędkość dronu (przy braku ładunku oraz zerowej wadze paliwa)
+\par p – waga paliwa w zbiorniku
+\par q – sumaryczna waga przewożonych ładunków
+\par m – masa własna dronu
+\textcolor{red}{KOSMETYKA: brzydkie indeksy.}
+\par Wyliczona prędkość jest prędkością względem powietrza. Model uwzględnia zmianę rzeczywistej prędkości dronu względem ziemi pod wpływem wiatru. Zależność przedstawia poniższy wzór:
+
+\textcolor{red}{Twierdzenie cosinusów eureka!! Sprawdzić i rozstrzygnąć czy + czy -. Chyba + ale czemu?}
+\par Gdzie:
+\par Alfa – kąt pomiędzy kierunkiem wiatru a aktualnym kierunkiem lotu
+\par W – prędkość wiatru
+\par V – maksymalna wyliczona wcześniej prędkość przelotowa dronu
+\textcolor{red}{KOSMETYKA: brzydkie indeksy.}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+\begin{equation}
+    \label{simple_equation}
+    \alpha = \sqrt{ \beta }
+\end{equation}
+
+\subsection{Subsection Heading Here}
+Write your subsection text here.
+\lipsum[1-15]
+
+
+\section{Conclusion}
+Write your conclusion here.
+
+\end{document}
