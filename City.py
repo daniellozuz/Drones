@@ -115,7 +115,7 @@ class City():
         th0 = mean(float(line.split(' ')[1]) for line in data.split('\n')[1:])
         for line in data.split('\n')[1:]:
             parcel_number, pos_x, pos_y = self.convert(line, th0)
-            self += Parcel(parcel_number, 1, Pos(pos_x, pos_y))
+            self += Parcel(parcel_number, 0.0001, Pos(pos_x, pos_y))
             self.position = Pos(pos_x, pos_y) # Base overlaps with last point.
 
 
@@ -239,8 +239,11 @@ class City():
             xxx = 0
         previous_drones = [deepcopy(drone) for drone in self.drones]
         previous_distance = self.total_distance
-        drone = choice(self.drones)
-        drone.twoopt()
+        if randrange(2) == 0:
+            drone = choice(self.drones)
+            drone.twoopt()
+        else:
+            self.randomly_reinsert_parcels_between_drones(1)
         self.calculate_total_distance()
         self.total_distances['attempted'].append(self.total_distance)
         if self.total_distance < self.best_total_distance:

@@ -12,14 +12,17 @@ import plots
 
 # City creation
 city = City(metric='simple')
-#city.rload("a280.txt")
-city += Drone(1, 2400, 8, base=city.position)
+city.cload("ulysses22.txt")
+city += Drone(1, 24000, 8, base=city.position)
+#city += Drone(2, 24000, 8, base=city.position)
 
 # Computations
-#city.full_simulated_annealing(cooling_rate=0.9997, initial_temperature=10, final_temperature=0.001)
+city.full_simulated_annealing(cooling_rate=0.997, initial_temperature=1, final_temperature=0.0001)
 
-#city.test_everything(cooling_rate=0.9997, initial_temperature=10, final_temperature=0.001)
-plots.show_test_results()
+# city.test_everything(cooling_rate=0.997, initial_temperature=10000000, final_temperature=1000)
+# city.test_everything(cooling_rate=0.997, initial_temperature=0.00001, final_temperature=0.000000001)
+
+# plots.show_test_results()
 
 
 
@@ -34,3 +37,22 @@ plots.show_test_results()
 # city.store('test1.txt')
 
 # city.full_simulated_annealing()
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Przyklad - separacja na dwie strefy.
+# city = City(metric='total_time')
+# city.cload("punkty_krakow.txt")
+# city += Drone(1, 24000, 8, base=city.position)
+# city += Drone(2, 24000, 8, base=city.position)
+# city.full_simulated_annealing(cooling_rate=0.9997, initial_temperature=10, final_temperature=0.001)
