@@ -16,7 +16,7 @@ city += Drone(1, 24000, 8, base=city.position)
 city += Drone(2, 24000, 8, base=city.position)
 
 # Computations
-city.full_simulated_annealing(iterations=1000, initial_temperature=10, final_temperature=0.001)
+# city.full_simulated_annealing(iterations=1000, initial_temperature=10, final_temperature=0.001)
 
 # city.test_tsp(iterations=1000, initial_temperature=10000000, final_temperature=1000)
 # city.test_tsp(iterations=1000, initial_temperature=0.00001, final_temperature=0.000000001)
@@ -24,7 +24,7 @@ city.full_simulated_annealing(iterations=1000, initial_temperature=10, final_tem
 # city.test_tsp(iterations=10000, initial_temperature=10, final_temperature=0.001)
 # city.test_tsp(iterations=1000, initial_temperature=0.01, final_temperature=0.000001)
 
-# plots.show_test_results()
+plots.show_test_results()
 
 
 # city = City(metric='total_time')
