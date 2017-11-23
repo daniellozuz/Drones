@@ -97,7 +97,11 @@ class Drone(object):
 
     def twoopt(self):
         """Performs a 2-opt modification of parcels."""
+<<<<<<< HEAD
         if len(self.parcels) == 0:
+=======
+        if not self.parcels:
+>>>>>>> parent of bb1aac7... Code refactoring.
             return
         #assert len(self.parcels) > 0, 'No parcels!'
         i, k = sorted([randrange(len(self.parcels)), randrange(len(self.parcels))])

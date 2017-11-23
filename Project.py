@@ -17,12 +17,12 @@ city += Drone(1, 24000, 8, base=city.position)
 #city += Drone(2, 24000, 8, base=city.position)
 
 # Computations
-city.full_simulated_annealing(cooling_rate=0.997, initial_temperature=1, final_temperature=0.0001)
+#city.full_simulated_annealing(cooling_rate=0.997, initial_temperature=1, final_temperature=0.0001)
 
 # city.test_everything(cooling_rate=0.997, initial_temperature=10000000, final_temperature=1000)
 # city.test_everything(cooling_rate=0.997, initial_temperature=0.00001, final_temperature=0.000000001)
 
-# plots.show_test_results()
+plots.show_test_results()
 
 
 
