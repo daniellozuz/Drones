@@ -1,8 +1,10 @@
 """Module provides plotting functions, which take city as an argument."""
 
+
 import matplotlib.pyplot as plt
 import csv
 import os
+
 
 def show_parcels(city):
     """Shows parcels on a map (for now overlaps drone paths)."""
@@ -10,6 +12,7 @@ def show_parcels(city):
     y_positions = [parcel.position.y for parcel in city.parcels]
     plt.plot(x_positions, y_positions, 'ro')
     plt.plot(city.position.x, city.position.y, 'go')
+
 
 def show_drone_paths(city, final=False):
     """Shows drones paths on a map."""
@@ -33,32 +36,43 @@ def show_drone_paths(city, final=False):
     show_parcels(city)
     plt.pause(0.05)
 
+
 def show_distance_and_modification_history(city):
     """Plots consecutive iterations of an angorithm."""
     plt.ioff()
     plt.clf()
+    plt.subplot(211)
+    handles = []
     for key, value in city.total_distances.items():
-        plt.plot(value, label=str(key), alpha=0.7)
-    plt.legend()
+        handles.extend(plt.plot(value, label=str(key), alpha=0.7))
+    plt.legend(handles=handles)
+    plt.subplot(212)
+    handles = []
+    for key, value in city.stats.items():
+        if str(key) != 'neighbour_chain_lengths':
+            handles.extend(plt.plot(value, label=str(key)))
+    plt.legend(handles=handles, loc=1)
     plt.show()
+
 
 def show_test_results():
     """Plots all test results."""
-    result_files = [f for f in os.listdir('test_results') if f.endswith('.csv')]
+    result_files = [f for f in os.listdir(os.path.join(os.getcwd(), 'test_results'))]
+    handles = []
     for result_file in result_files:
-        with open(os.path.join('test_results', result_file)) as test_result:
-            reader = csv.reader(test_result)
-            data = []
-            for i, row in enumerate(reader):
-                if i == 0:
-                    param_names = row
-                elif i == 1:
-                    params = row
-                elif i == 2:
-                    continue
-                else:
-                    data.append(int(row[3]))
-        label = ' '.join([str(v1) + '=' + str(v2) for v1, v2 in zip(param_names, params)])
-        plt.plot(data, label=label)
-    plt.legend()
+        if result_file.endswith('.csv'):
+            with open(os.path.join('test_results', result_file)) as a_file:
+                reader = csv.reader(a_file)
+                data = []
+                legend = []
+                for row in reader:
+                    if len(row) == 3:
+                        legend.append(row)
+                    else:
+                        data.append(row[3])
+            data = [int(item) for item in data[1:]]
+            label = [str(v1) + '=' + str(v2) for v1, v2 in zip(legend[0], legend[1])]
+            label = ' '.join(label)
+            handles.extend(plt.plot(data, label=label))
+    plt.legend(handles=handles, loc=1)
     plt.show()

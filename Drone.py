@@ -97,7 +97,7 @@ class Drone(object):
 
     def twoopt(self):
         """Performs a 2-opt modification of parcels."""
-        if not self.parcels:
+        if len(self.parcels) == 0:
             return
         #assert len(self.parcels) > 0, 'No parcels!'
         i, k = sorted([randrange(len(self.parcels)), randrange(len(self.parcels))])
