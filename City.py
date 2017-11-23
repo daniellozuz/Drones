@@ -124,18 +124,17 @@ class City():
 
     def prepare_algorithm(self):
         """Initialization procedure to prepare simulated annealing algorithm."""
+        self.reassign_parcels()
+        self.calculate_cost()
+        self.calculate_scale()
+
+    def reassign_parcels(self):
+        """Reassigns parcels among drones at random."""
         for drone in self.drones:
             drone.parcels = []
         for parcel in sample(self.parcels, len(self.parcels)):
             drone = choice(self.drones)
             drone += parcel
-        self.calculate_cost()
-        max_x = max([parcel.position.x for parcel in self.parcels])
-        max_y = max([parcel.position.y for parcel in self.parcels])
-        min_x = min([parcel.position.x for parcel in self.parcels])
-        min_y = min([parcel.position.y for parcel in self.parcels])
-        self.scale = max(max_x - min_x, max_y - min_y) # XXX why the division?
-        # XXX Probably due to modification function parameters.
 
     def calculate_cost(self):
         """Returns total distance or time covered by drones (depending on metric used)."""
@@ -143,6 +142,14 @@ class City():
             self.total_distance = sum(drone.path_length for drone in self.drones)
         if self.metric == 'total_time':
             self.total_distance = max(drone.total_time for drone in self.drones)
+
+    def calculate_scale(self):
+        """Calculates scale according to data range."""
+        max_x = max([parcel.position.x for parcel in self.parcels])
+        max_y = max([parcel.position.y for parcel in self.parcels])
+        min_x = min([parcel.position.x for parcel in self.parcels])
+        min_y = min([parcel.position.y for parcel in self.parcels])
+        self.scale = max(max_x - min_x, max_y - min_y)
 
     def test_everything(self, cooling_rate=0.99, initial_temperature=1000, final_temperature=0.1):
         """Performs simulated annealing for all test cases and creates .txt file with summary."""
