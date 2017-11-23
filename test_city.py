@@ -70,8 +70,8 @@ class TestCity(unittest.TestCase):
         self.assertEqual((sum(len(drone.parcels) for drone in self.city.drones)), 2)
 
 
-    def test_calculate_total_distance(self):
-        """Checks total distance recalculation for a single drone with a single parcel."""
+    def test_calculate_cost(self):
+        """Checks cost recalculation for a single drone with a single parcel."""
 
         self.assertEqual(self.city.total_distance, 0)
 

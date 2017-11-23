@@ -129,7 +129,7 @@ class City():
         for parcel in sample(self.parcels, len(self.parcels)):
             drone = choice(self.drones)
             drone += parcel
-        self.calculate_total_distance()
+        self.calculate_cost()
         max_x = max([parcel.position.x for parcel in self.parcels])
         max_y = max([parcel.position.y for parcel in self.parcels])
         min_x = min([parcel.position.x for parcel in self.parcels])
@@ -137,7 +137,7 @@ class City():
         self.scale = max(max_x - min_x, max_y - min_y) # XXX why the division?
         # XXX Probably due to modification function parameters.
 
-    def calculate_total_distance(self):
+    def calculate_cost(self):
         """Returns total distance or time covered by drones (depending on metric used)."""
         if self.metric == 'simple':
             self.total_distance = sum(drone.path_length for drone in self.drones)
@@ -181,7 +181,7 @@ class City():
         prev = self.total_distance
         temperature = initial_temperature
         while temperature > final_temperature:
-            self.simulated_annealing(temperature, test=test)
+            self.iteration(temperature, test=test)
             if not test:
                 print('Now', round(self.total_distance), 'Before', round(prev), 'Best',
                       round(prev_best), 'Temp', temperature, '\n')
@@ -195,44 +195,45 @@ class City():
             plots.show_drone_paths(self, final=True)
             plots.show_distance_history(self)
 
-    def simulated_annealing(self, temperature, test=False):
+    def iteration(self, temperature, test=False):
         """Performs one iteration of simulated annealing algorithm."""
         # XXX needs major refactoring.
-        previous_drones = [deepcopy(drone) for drone in self.drones]
-        previous_distance = self.total_distance
-        if randrange(2) == 0:
-            drone = choice(self.drones)
-            drone.twoopt()
-        else:
-            self.randomly_reinsert_parcels_between_drones(1)
-        self.calculate_total_distance()
+        previous_drones, previous_distance = self.save()
+        choice([choice(self.drones).twoopt, self.reinsert_parcel])()
+        self.calculate_cost()
         self.total_distances['attempted'].append(self.total_distance)
         if self.total_distance < self.best_total_distance:
             self.best_total_distance = self.total_distance
         improvement = previous_distance - self.total_distance
-        exponent = min(100, improvement / (temperature * self.scale))
-        weird_value = e ** exponent
+        acceptance = e ** min(100, improvement / (temperature * self.scale))
         if not test:
-            print('Weird value:', weird_value)
-        if weird_value > random():
+            print('Weird value:', acceptance)
+        if acceptance > random():
             if not test:
                 print('Passed.')
         else:
             if not test:
                 print('Revert.')
-            for i in range(len(self.drones)):
-                self.drones[i] = previous_drones[i]
-            self.calculate_total_distance()
+            self.revert(previous_drones)
         self.total_distances['best'].append(self.best_total_distance)
         self.total_distances['accepted'].append(self.total_distance)
 
-    def randomly_reinsert_parcels_between_drones(self, amount):
-        """Moves random parcel between random drones amount number of times."""
-        for _ in range(amount):
-            from_drone = choice(self.drones)
-            if not from_drone.parcels:
-                continue
-            to_drone = choice(self.drones)
-            pop_index = randrange(0, len(from_drone.parcels))
-            insert_index = randint(0, len(to_drone.parcels))
-            to_drone.parcels.insert(insert_index, from_drone.parcels.pop(pop_index))
+    def save(self):
+        """Save drones' state."""
+        return [deepcopy(drone) for drone in self.drones], self.total_distance
+
+    def revert(self, previous_drones):
+        """Reverts drones' state into previous state."""
+        for i in range(len(self.drones)):
+            self.drones[i] = previous_drones[i]
+        self.calculate_cost()
+
+    def reinsert_parcel(self):
+        """Moves a random parcel between two random drones."""
+        from_drone = choice(self.drones)
+        if not from_drone.parcels:
+            return
+        to_drone = choice(self.drones)
+        pop_index = randrange(0, len(from_drone.parcels))
+        insert_index = randint(0, len(to_drone.parcels))
+        to_drone.parcels.insert(insert_index, from_drone.parcels.pop(pop_index))
