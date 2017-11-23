@@ -98,9 +98,9 @@ class City():
     def convert(self, line, th0):
         """Converts a line into a tuple: (number, pox_x, pos_y)."""
         parcel_number, latitude, longitude = line.split(' ')
-        R = 6371000
-        pos_x = round(R * radians(float(longitude)) * cos(radians(th0)))
-        pos_y = round(R * radians(float(latitude)))
+        earth_radius = 6371000
+        pos_x = round(earth_radius * radians(float(longitude)) * cos(radians(th0)))
+        pos_y = round(earth_radius * radians(float(latitude)))
         return int(parcel_number), pos_x, pos_y
 
     def store(self, json_file_name):
@@ -204,7 +204,7 @@ class City():
 
     def iteration(self, temperature, test=False):
         """Performs one iteration of simulated annealing algorithm."""
-        # XXX needs major refactoring.
+        # XXX needs slight refactoring.
         previous_drones, previous_distance = self.save()
         choice([choice(self.drones).twoopt, self.reinsert_parcel])()
         self.calculate_cost()
