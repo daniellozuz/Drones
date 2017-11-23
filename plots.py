@@ -4,15 +4,19 @@ import csv
 import os
 import matplotlib.pyplot as plt
 
-def show_parcels(city):
+def show_parcels(city, test=False):
     """Shows parcels on a map (for now overlaps drone paths)."""
+    if test:
+        return
     x_positions = [parcel.position.x for parcel in city.parcels]
     y_positions = [parcel.position.y for parcel in city.parcels]
     plt.plot(x_positions, y_positions, 'ro')
     plt.plot(city.position.x, city.position.y, 'go')
 
-def show_drone_paths(city, final=False):
+def show_drone_paths(city, final=False, test=False):
     """Shows drones paths on a map."""
+    if test:
+        return
     plt.ion()
     if final:
         plt.ioff()
@@ -33,8 +37,10 @@ def show_drone_paths(city, final=False):
     show_parcels(city)
     plt.pause(0.05)
 
-def show_distance_history(city):
+def show_distance_history(city, test=False):
     """Plots consecutive iterations of an angorithm."""
+    if test:
+        return
     plt.ioff()
     plt.clf()
     for key, value in city.total_distances.items():

@@ -181,9 +181,8 @@ class City():
                                  cooling_rate=0.9997, test=False):
         """Loops over sim annealing."""
         self.prepare_algorithm()
-        if not test:
-            plots.show_parcels(self)
-            plots.show_drone_paths(self)
+        plots.show_parcels(self, test=test)
+        plots.show_drone_paths(self, test=test)
         prev_best = self.total_distance
         prev = self.total_distance
         temperature = initial_temperature
@@ -195,12 +194,10 @@ class City():
             temperature *= cooling_rate
             prev = self.total_distance
             if self.total_distance < prev_best:
-                if not test:
-                    plots.show_drone_paths(self)
+                plots.show_drone_paths(self, test=test)
                 prev_best = self.total_distance
-        if not test:
-            plots.show_drone_paths(self, final=True)
-            plots.show_distance_history(self)
+        plots.show_drone_paths(self, final=True, test=test)
+        plots.show_distance_history(self, test=test)
 
     def iteration(self, temperature, test=False):
         """Performs one iteration of simulated annealing algorithm."""
