@@ -48,11 +48,11 @@ def show_distance_history(city, test=False):
     plt.legend()
     plt.show()
 
-def show_test_results():
-    """Plots all test results."""
-    result_files = [f for f in os.listdir('test_results') if f.endswith('.csv')]
+def show_test_results(version='TSP'):
+    """Plots all test results (so far TSP only)."""
+    result_files = [f for f in os.listdir(version, 'test_results') if f.endswith('.csv')]
     for result_file in result_files:
-        with open(os.path.join('test_results', result_file)) as test_result:
+        with open(os.path.join(version, 'test_results', result_file)) as test_result:
             reader = csv.reader(test_result)
             data = []
             legend = []

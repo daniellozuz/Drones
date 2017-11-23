@@ -18,7 +18,7 @@ import plots
 class City():
     """Engine implementation and main interface."""
 
-    def __init__(self, position=Pos(0, 0), wind=(0, 0), metric='simple'):
+    def __init__(self, position=Pos(0, 0), wind=(0, 0), metric='total_time'):
         self.metric = metric
         self.scale = None
         self.solution = None
@@ -72,8 +72,8 @@ class City():
             self += Drone(drone['number'], drone['max_capacity'], drone['max_speed'])
 
     def rload(self, raw_file_name):
-        """Loads performance testing data from .txt file in raw format."""
-        with open(os.path.join("raw_test", raw_file_name)) as raw_file:
+        """Loads performance testing data from .txt file in raw format (used in test_tsp only)."""
+        with open(os.path.join("test_TSP", "raw_test", raw_file_name)) as raw_file:
             data = raw_file.read().strip('\n')
         self.solution = int(data.split('\n')[0])
         self.parcels = []
@@ -84,8 +84,8 @@ class City():
 
     def cload(self, coord_file_name):
         """Loads data from GPS coordinates. The solutions are approximate due to conversion to
-            xy coordinates."""
-        with open(os.path.join("coord_test", coord_file_name)) as coord_file:
+            xy coordinates (used in test_tsp only)."""
+        with open(os.path.join("test_TSP", "coord_test", coord_file_name)) as coord_file:
             data = coord_file.read().strip('\n')
         self.solution = int(data.split('\n')[0])
         self.parcels = []
@@ -153,12 +153,42 @@ class City():
 
     def test_everything(self, iterations=1000, initial_temperature=10, final_temperature=0.001):
         """Performs simulated annealing for all test cases and creates .txt file with summary."""
+        # XXX not used so far.
         raw_test_cases = [f for f in os.listdir(os.path.join(os.getcwd(), "raw_test"))]
         coord_test_cases = [f for f in os.listdir(os.path.join(os.getcwd(), "coord_test"))]
         test_cases = raw_test_cases + coord_test_cases
         print(test_cases)
         test_file_name = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S.csv')
         with open(os.path.join("test_results", test_file_name), 'w', newline='') as result_file:
+            csvwriter = csv.writer(result_file)
+            csvwriter.writerow(['iterations', 'initial_temperature', 'final_temperature'])
+            csvwriter.writerow([iterations, initial_temperature, final_temperature])
+            csvwriter.writerow(['test_case', 'result', 'solution', 'overshoot'])
+            for test_case in test_cases:
+                print("Testing", test_case)
+                if test_case in raw_test_cases:
+                    self.rload(test_case)
+                if test_case in coord_test_cases:
+                    self.cload(test_case)
+                self.full_simulated_annealing(iterations=iterations,
+                                              initial_temperature=initial_temperature,
+                                              final_temperature=final_temperature,
+                                              test=True)
+                print(test_case, round(self.total_cost), self.solution)
+                overshoot = round(100 * (self.total_cost - self.solution) / self.solution)
+                print('Overshoot', overshoot, '%')
+                csvwriter.writerow([test_case, str(round(self.total_cost)),
+                                    str(self.solution), str(overshoot)])
+
+    def test_tsp(self, iterations=1000, initial_temperature=10, final_temperature=0.001):
+        """Classic TSP with no drone spec or parcel weight considered (known solutions)."""
+        self.metric = 'simple'
+        raw_test_cases = [f for f in os.listdir(os.path.join("test_TSP", "raw_test"))]
+        coord_test_cases = [f for f in os.listdir(os.path.join("test_TSP", "coord_test"))]
+        test_cases = raw_test_cases + coord_test_cases
+        print(test_cases)
+        test_file_name = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S.csv')
+        with open(os.path.join("test_TSP", "test_results", test_file_name), 'w', newline='') as result_file:
             csvwriter = csv.writer(result_file)
             csvwriter.writerow(['iterations', 'initial_temperature', 'final_temperature'])
             csvwriter.writerow([iterations, initial_temperature, final_temperature])
