@@ -1,6 +1,5 @@
 """Module implementing minor functionalities."""
 
-
 from collections import namedtuple
 from functools import lru_cache
 Position = namedtuple('Position', ['x', 'y'])

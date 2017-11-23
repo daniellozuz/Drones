@@ -3,17 +3,15 @@
 # TODO implement interface for external specification of drone parameters, that is:
 # formulae/discrete characteristics of fuel_consumption or max_speed.
 
-
 from math import e, sqrt, sin, cos, atan2
+from random import randrange
+
 from common import Position as Pos
 from common import dist
 from Parcel import Parcel
-from random import randrange
-
 
 class Drone(object):
     """Provides drone implementation."""
-
 
     def __init__(self, number, max_capacity, max_speed, base=Pos(0, 0), parcels=None,
                  drone_mass=20, max_fuel=5, wind=(0, 0), loading_time=5, base_fuel_consumption=0.001):
@@ -34,7 +32,6 @@ class Drone(object):
         self.wind = wind
         self.loading_time = loading_time # Rising + falling + refuelling + maintenance + reloading
 
-
     def __add__(self, parcels):
         if isinstance(parcels, Parcel):
             parcels = [parcels]
@@ -43,14 +40,12 @@ class Drone(object):
                 self.parcels.append(parcel)
         return self
 
-
     def __str__(self):
         string = '{:>20}'.format(self.number)
         string += '{:>20}'.format(self.max_capacity)
         string += '{:>20}'.format(self.max_speed)
         string += '{:>20}\n'.format(len(self.parcels))
         return string
-
 
     def __repr__(self):
         string = 'Number: {}, '.format(self.number)
@@ -59,18 +54,35 @@ class Drone(object):
         string += 'Parcels: {}\n'.format([repr(parcel) for parcel in self.parcels])
         return string
 
-
     @property
     def speed(self):
         """Calculate speed according to drone's state."""
         return self.max_speed / e ** ((self.fuel + self.used_capacity) / self.mass)
-
 
     @property
     def fuel_consumption(self):
         """Calculate fuel consumption according to drone's state."""
         return self.base_fuel_consumption * e ** ((self.fuel + self.used_capacity) / self.mass)
 
+    @property
+    def path_length(self):
+        """Get recalculated path length."""
+        path = self.path
+        return sum(dist(point1, point2) for point1, point2 in zip(path[:-1], path[1:]))
+
+    @property
+    def path(self):
+        """Get recalculated drone's path."""
+        self.used_capacity = 0
+        path = [self.base]
+        for parcel in self.parcels:
+            self.used_capacity += parcel.weight
+            if self.used_capacity > self.max_capacity:
+                path.append(self.base)
+                self.used_capacity = parcel.weight
+            path.append(parcel.position)
+        path.append(self.base)
+        return path
 
     @property
     def total_time(self):
@@ -93,24 +105,6 @@ class Drone(object):
         total_time += time
         self.cargo = []
         return total_time
-
-
-    def twoopt(self):
-        """Performs a 2-opt modification of parcels."""
-<<<<<<< HEAD
-        if len(self.parcels) == 0:
-=======
-        if not self.parcels:
->>>>>>> parent of bb1aac7... Code refactoring.
-            return
-        #assert len(self.parcels) > 0, 'No parcels!'
-        i, k = sorted([randrange(len(self.parcels)), randrange(len(self.parcels))])
-        new_parcels = []
-        new_parcels.extend(self.parcels[:i])
-        new_parcels.extend(reversed(self.parcels[i:k]))
-        new_parcels.extend(self.parcels[k:])
-        self.parcels = new_parcels
-
 
     def is_possible(self):
         """Check whether such a cargo is possible to be delivered in one go."""
@@ -140,20 +134,6 @@ class Drone(object):
             return False
         return True
 
-
-    def absolute_speed(self, pos0, pos1):
-        """Calculate speed with respect to the ground (due to wind and flight direction)."""
-        W = sqrt(self.wind[0] ** 2 + self.wind[1] ** 2)
-        V = self.speed
-        assert V > W, "Wind is too strong."
-        x = pos1[0] - pos0[0]
-        y = pos1[1] - pos0[1]
-        a1 = atan2(y, x)
-        a2 = atan2(self.wind[1], self.wind[0])
-        alpha = abs(a2 - a1)
-        return W * cos(alpha) + sqrt(V ** 2 - W ** 2 * sin(alpha) ** 2)
-
-
     def trip_time(self, cargo):
         """Calculate time needed to deliver cargo."""
         total_time = 0
@@ -179,25 +159,25 @@ class Drone(object):
         fuel_cost = self.fuel_consumption * time
         return total_time
 
+    def absolute_speed(self, start_position, end_position):
+        """Calculate speed with respect to the ground (due to wind and flight direction)."""
+        wind_speed = sqrt(self.wind[0] ** 2 + self.wind[1] ** 2)
+        drone_speed = self.speed
+        assert drone_speed > wind_speed, "Wind is too strong."
+        self.absolute_speed(start_position, end_position)
+        angle1 = atan2(end_position.y - start_position.y, end_position.x - start_position.x)
+        angle2 = atan2(self.wind[1], self.wind[0])
+        alpha = abs(angle2 - angle1)
+        return wind_speed * cos(alpha) + sqrt(drone_speed ** 2 - wind_speed ** 2 * sin(alpha) ** 2)
 
-    @property
-    def path(self):
-        """Get recalculated drone's path."""
-        self.used_capacity = 0
-        path = [self.base]
-        for parcel in self.parcels:
-            self.used_capacity += parcel.weight
-            if self.used_capacity > self.max_capacity:
-                path.append(self.base)
-                self.used_capacity = parcel.weight
-            path.append(parcel.position)
-        path.append(self.base)
-        return path
-
-
-    @property
-    def path_length(self):
-        """Get recalculated path length."""
-        path = self.path
-        # XXX Consider using itertools pairwise function / tee generator.
-        return sum(dist(point1, point2) for point1, point2 in zip(path[:-1], path[1:]))
+    def twoopt(self):
+        """Performs a 2-opt modification of parcels."""
+        if not self.parcels:
+            return
+        #assert len(self.parcels) > 0, 'No parcels!'
+        i, k = sorted([randrange(len(self.parcels)), randrange(len(self.parcels))]) # XXX what if the same indeces?
+        new_parcels = []
+        new_parcels.extend(self.parcels[:i])
+        new_parcels.extend(reversed(self.parcels[i:k]))
+        new_parcels.extend(self.parcels[k:])
+        self.parcels = new_parcels
