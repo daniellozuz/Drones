@@ -26,9 +26,9 @@ class City():
         self.wind = wind
         self.drones = []
         self.parcels = []
-        self.total_distance = 0
-        self.best_total_distance = inf
-        self.total_distances = {'accepted' : [], 'attempted' : [], 'best' : []}
+        self.total_cost = 0
+        self.best_total_cost = inf
+        self.total_costs = {'accepted' : [], 'attempted' : [], 'best' : []}
 
     def __add__(self, items):
         if isinstance(items, Drone) or isinstance(items, Parcel):
@@ -52,8 +52,8 @@ class City():
             string += str(drone)
         string += f'\nThere are {len(self.parcels)} parcels in the city:\n'
         string += '{:>20}'.format('Parcel ID')
-        string += '{:>20}'.format('Weight')
-        string += '{:>20}\n'.format('Position')
+        string += '{:>20}'.format('Position')
+        string += '{:>20}\n'.format('Weight')
         for parcel in self.parcels:
             string += str(parcel)
         return string
@@ -67,7 +67,7 @@ class City():
         self.parcels = []
         self.drones = []
         for parcel in data['parcels']:
-            self += Parcel(parcel['number'], parcel['weight'], Pos(parcel['x'], parcel['y']))
+            self += Parcel(parcel['number'], Pos(parcel['x'], parcel['y']), parcel['weight'])
         for drone in data['drones']:
             self += Drone(drone['number'], drone['max_capacity'], drone['max_speed'])
 
@@ -79,7 +79,7 @@ class City():
         self.parcels = []
         for line in data.split('\n')[1:]:
             parcel_number, pos_x, pos_y = line.split(' ')
-            self += Parcel(int(parcel_number), 1, Pos(float(pos_x), float(pos_y)))
+            self += Parcel(int(parcel_number), Pos(float(pos_x), float(pos_y)))
             self.position = Pos(float(pos_x), float(pos_y)) # Base overlaps with last point.
 
     def cload(self, coord_file_name):
@@ -92,7 +92,7 @@ class City():
         th0 = mean(float(line.split(' ')[1]) for line in data.split('\n')[1:])
         for line in data.split('\n')[1:]:
             parcel_number, pos_x, pos_y = self.convert(line, th0)
-            self += Parcel(parcel_number, 0.0001, Pos(pos_x, pos_y))
+            self += Parcel(parcel_number, Pos(pos_x, pos_y))
             self.position = Pos(pos_x, pos_y) # Base overlaps with last point.
 
     def convert(self, line, th0):
@@ -139,9 +139,9 @@ class City():
     def calculate_cost(self):
         """Returns total distance or time covered by drones (depending on metric used)."""
         if self.metric == 'simple':
-            self.total_distance = sum(drone.path_length for drone in self.drones)
+            self.total_cost = sum(drone.path_length for drone in self.drones)
         if self.metric == 'total_time':
-            self.total_distance = max(drone.total_time for drone in self.drones)
+            self.total_cost = max(drone.total_time for drone in self.drones)
 
     def calculate_scale(self):
         """Calculates scale according to data range."""
@@ -151,7 +151,7 @@ class City():
         min_y = min([parcel.position.y for parcel in self.parcels])
         self.scale = max(max_x - min_x, max_y - min_y)
 
-    def test_everything(self, cooling_rate=0.99, initial_temperature=1000, final_temperature=0.1):
+    def test_everything(self, iterations=1000, initial_temperature=10, final_temperature=0.001):
         """Performs simulated annealing for all test cases and creates .txt file with summary."""
         raw_test_cases = [f for f in os.listdir(os.path.join(os.getcwd(), "raw_test"))]
         coord_test_cases = [f for f in os.listdir(os.path.join(os.getcwd(), "coord_test"))]
@@ -160,8 +160,8 @@ class City():
         test_file_name = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S.csv')
         with open(os.path.join("test_results", test_file_name), 'w', newline='') as result_file:
             csvwriter = csv.writer(result_file)
-            csvwriter.writerow(['cooling_rate', 'initial_temperature', 'final_temperature'])
-            csvwriter.writerow([cooling_rate, initial_temperature, final_temperature])
+            csvwriter.writerow(['iterations', 'initial_temperature', 'final_temperature'])
+            csvwriter.writerow([iterations, initial_temperature, final_temperature])
             csvwriter.writerow(['test_case', 'result', 'solution', 'overshoot'])
             for test_case in test_cases:
                 print("Testing", test_case)
@@ -169,33 +169,36 @@ class City():
                     self.rload(test_case)
                 if test_case in coord_test_cases:
                     self.cload(test_case)
-                self.full_simulated_annealing(cooling_rate=cooling_rate, initial_temperature=1000,
-                                              final_temperature=0.1, test=True)
-                print(test_case, round(self.total_distance), self.solution)
-                overshoot = round(100 * (self.total_distance - self.solution) / self.solution)
+                self.full_simulated_annealing(iterations=iterations,
+                                              initial_temperature=initial_temperature,
+                                              final_temperature=final_temperature,
+                                              test=True)
+                print(test_case, round(self.total_cost), self.solution)
+                overshoot = round(100 * (self.total_cost - self.solution) / self.solution)
                 print('Overshoot', overshoot, '%')
-                csvwriter.writerow([test_case, str(round(self.total_distance)),
+                csvwriter.writerow([test_case, str(round(self.total_cost)),
                                     str(self.solution), str(overshoot)])
 
-    def full_simulated_annealing(self, initial_temperature=1000, final_temperature=0.1,
-                                 cooling_rate=0.9997, test=False):
+    def full_simulated_annealing(self, initial_temperature=10, final_temperature=0.001,
+                                 iterations=10_000, test=False):
         """Loops over sim annealing."""
+        cooling_rate = pow(final_temperature / initial_temperature, 1 / iterations)
         self.prepare_algorithm()
         plots.show_parcels(self, test=test)
         plots.show_drone_paths(self, test=test)
-        prev_best = self.total_distance
-        prev = self.total_distance
+        prev_best = self.total_cost
+        prev = self.total_cost
         temperature = initial_temperature
         while temperature > final_temperature:
             self.iteration(temperature, test=test)
             if not test:
-                print('Now', round(self.total_distance), 'Before', round(prev), 'Best',
+                print('Now', round(self.total_cost), 'Before', round(prev), 'Best',
                       round(prev_best), 'Temp', temperature, '\n')
             temperature *= cooling_rate
-            prev = self.total_distance
-            if self.total_distance < prev_best:
+            prev = self.total_cost
+            if self.total_cost < prev_best:
                 plots.show_drone_paths(self, test=test)
-                prev_best = self.total_distance
+                prev_best = self.total_cost
         plots.show_drone_paths(self, final=True, test=test)
         plots.show_distance_history(self, test=test)
 
@@ -205,10 +208,10 @@ class City():
         previous_drones, previous_distance = self.save()
         choice([choice(self.drones).twoopt, self.reinsert_parcel])()
         self.calculate_cost()
-        self.total_distances['attempted'].append(self.total_distance)
-        if self.total_distance < self.best_total_distance:
-            self.best_total_distance = self.total_distance
-        improvement = previous_distance - self.total_distance
+        self.total_costs['attempted'].append(self.total_cost)
+        if self.total_cost < self.best_total_cost:
+            self.best_total_cost = self.total_cost
+        improvement = previous_distance - self.total_cost
         acceptance = e ** min(100, improvement / (temperature * self.scale))
         if not test:
             print('Weird value:', acceptance)
@@ -219,12 +222,12 @@ class City():
             if not test:
                 print('Revert.')
             self.revert(previous_drones)
-        self.total_distances['best'].append(self.best_total_distance)
-        self.total_distances['accepted'].append(self.total_distance)
+        self.total_costs['best'].append(self.best_total_cost)
+        self.total_costs['accepted'].append(self.total_cost)
 
     def save(self):
         """Save drones' state."""
-        return [deepcopy(drone) for drone in self.drones], self.total_distance
+        return [deepcopy(drone) for drone in self.drones], self.total_cost
 
     def revert(self, previous_drones):
         """Reverts drones' state into previous state."""

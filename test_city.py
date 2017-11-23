@@ -22,8 +22,8 @@ class TestCity(unittest.TestCase):
         self.drone0 = Drone(0, 50, 10) # Empty drone
         self.drone1 = Drone(1, 140, 8) # Drone with parcels
 
-        self.parcel1 = Parcel(1, 10, Pos(1, 1))
-        self.parcel2 = Parcel(2, 5, Pos(-20, -1))
+        self.parcel1 = Parcel(1, Pos(1, 1), 10)
+        self.parcel2 = Parcel(2, Pos(-20, -1), 5)
 
         self.drone1 += self.parcel1
         self.drone1 += self.parcel2
@@ -73,13 +73,13 @@ class TestCity(unittest.TestCase):
     def test_calculate_cost(self):
         """Checks cost recalculation for a single drone with a single parcel."""
 
-        self.assertEqual(self.city.total_distance, 0)
+        self.assertEqual(self.city.total_cost, 0)
 
         self.city += self.drone0
         self.city += self.parcel1
         self.city.prepare_algorithm()
 
-        self.assertEqual(self.city.total_distance, 2.8284271247461903)
+        self.assertEqual(self.city.total_cost, 2.8284271247461903)
 
 
     def test_jload(self):

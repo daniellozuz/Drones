@@ -28,11 +28,11 @@ def show_drone_paths(city, final=False, test=False):
         else:
             print("Error: no path to be displayed.")
     if city.solution:
-        percentage = int(100 * (city.total_distance - city.solution) / city.solution)
-        plt.title('Total distance: ' + str(round(city.total_distance)) + ' Solution: ' +\
+        percentage = int(100 * (city.total_cost - city.solution) / city.solution)
+        plt.title('Total cost: ' + str(round(city.total_cost)) + ' Solution: ' +\
                   str(city.solution) + ' (+' + str(percentage) + '% overshoot)')
     else:
-        plt.title('Total distance: ' + str(round(city.total_distance)))
+        plt.title('Total cost: ' + str(round(city.total_cost)))
     plt.show()
     show_parcels(city)
     plt.pause(0.05)
@@ -43,7 +43,7 @@ def show_distance_history(city, test=False):
         return
     plt.ioff()
     plt.clf()
-    for key, value in city.total_distances.items():
+    for key, value in city.total_costs.items():
         plt.plot(value, label=str(key), alpha=0.7)
     plt.legend()
     plt.show()

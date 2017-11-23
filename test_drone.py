@@ -18,8 +18,8 @@ class TestDrone(unittest.TestCase):
         self.drone0 = Drone(0, 50, 10) # Empty drone
         self.drone1 = Drone(1, 140, 8) # Drone with parcels
 
-        self.parcel1 = Parcel(1, 10, Pos(1, 1))
-        self.parcel2 = Parcel(2, 5, Pos(-20, -1))
+        self.parcel1 = Parcel(1, Pos(1, 1), 10)
+        self.parcel2 = Parcel(2, Pos(-20, -1), 5)
 
         self.drone1 += self.parcel1
         self.drone1 += self.parcel2
@@ -30,7 +30,7 @@ class TestDrone(unittest.TestCase):
 
         self.assertEqual(self.drone0.parcels, [])
 
-        self.drone0 += Parcel(0, 50, Pos(10, 10))
+        self.drone0 += Parcel(0, Pos(10, 10), 50)
 
         self.assertEqual(len(self.drone0.parcels), 1)
         self.assertIsInstance(self.drone0.parcels[0], Parcel)
@@ -43,7 +43,7 @@ class TestDrone(unittest.TestCase):
 
         self.assertEqual(self.drone0.parcels, [])
 
-        self.drone0 += [Parcel(0, 5, Pos(10, 10)), Parcel(1, 15, Pos(20, 20))]
+        self.drone0 += [Parcel(0, Pos(10, 10), 5), Parcel(1, Pos(20, 20), 15)]
 
         self.assertEqual(len(self.drone0.parcels), 2)
         self.assertIsInstance(self.drone0.parcels[0], Parcel)
