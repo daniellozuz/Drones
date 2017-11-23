@@ -164,7 +164,6 @@ class Drone(object):
         wind_speed = sqrt(self.wind[0] ** 2 + self.wind[1] ** 2)
         drone_speed = self.speed
         assert drone_speed > wind_speed, "Wind is too strong."
-        self.absolute_speed(start_position, end_position)
         angle1 = atan2(end_position.y - start_position.y, end_position.x - start_position.x)
         angle2 = atan2(self.wind[1], self.wind[0])
         alpha = abs(angle2 - angle1)

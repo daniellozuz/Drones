@@ -2,7 +2,6 @@
 
     A programmer is supposed to specify the problem using the interface provided in City module."""
 
-
 from City import City
 from common import Position as Pos
 from Drone import Drone
@@ -22,7 +21,7 @@ city.full_simulated_annealing(cooling_rate=0.997, initial_temperature=1, final_t
 # city.test_everything(cooling_rate=0.997, initial_temperature=10000000, final_temperature=1000)
 # city.test_everything(cooling_rate=0.997, initial_temperature=0.00001, final_temperature=0.000000001)
 
-# plots.show_test_results()
+#plots.show_test_results()
 
 
 
@@ -50,7 +49,7 @@ city.full_simulated_annealing(cooling_rate=0.997, initial_temperature=1, final_t
 
 
 
-# Przyklad - separacja na dwie strefy.
+# # Przyklad - separacja na dwie strefy.
 # city = City(metric='total_time')
 # city.cload("punkty_krakow.txt")
 # city += Drone(1, 24000, 8, base=city.position)
