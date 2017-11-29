@@ -10,29 +10,29 @@ from Parcel import Parcel
 class Drone(object):
     """Provides drone implementation."""
 
-    def __init__(self, number, max_capacity=inf, max_speed=20, base=Pos(0, 0), parcels=None,
-                 drone_mass=20, max_fuel=5, wind=(0, 0), loading_time=5, base_fuel_consumption=0.001):
-        self.position = base
+    def __init__(self, number, base=Pos(0, 0), wind=(0, 0), drone_mass=20, max_capacity=inf,
+                 max_speed=20, max_fuel=5, base_fuel_consumption=0.001, altitude=50, factor=3,
+                 waiting_at_base=50, waiting_at_client=30):
         self.number = number
-        self.mass = drone_mass
+        self.base = base
+        self.position = base
+        self.wind = wind
+        self.drone_mass = drone_mass
         self.max_capacity = max_capacity
         self.used_capacity = 0
         self.max_speed = max_speed
         self.max_fuel = max_fuel
         self.fuel = max_fuel
         self.base_fuel_consumption = base_fuel_consumption
-        self.base = base
+        self.parcels = []
         self.cargo = []
-        if parcels is None:
-            parcels = []
-        self.parcels = parcels
-        self.wind = wind
         # TODO change it to appropriate altitude or add it.
         #                                      (Altitude)        (Waiting time (at client + at base))
-        self.loading_time = loading_time # (Rising + falling) + (refuelling + maintenance + reloading)
-        # self.waiting_at_client = waiting_at_client
-        # self.waiting_at_base = waiting_at_base
-        # self.altitude = altitude
+        #self.loading_time = loading_time # (Rising + falling) + (refuelling + maintenance + reloading)
+        self.altitude = altitude
+        self.factor = factor
+        self.waiting_at_base = waiting_at_base
+        self.waiting_at_client = waiting_at_client
 
     def __add__(self, parcels):
         if isinstance(parcels, Parcel):
@@ -59,12 +59,12 @@ class Drone(object):
     @property
     def speed(self):
         """Calculate speed according to drone's state."""
-        return self.max_speed / e ** ((self.fuel + self.used_capacity) / self.mass)
+        return self.max_speed / e ** ((self.fuel + self.used_capacity) / self.drone_mass)
 
     @property
     def fuel_consumption(self):
         """Calculate fuel consumption according to drone's state."""
-        return self.base_fuel_consumption * e ** ((self.fuel + self.used_capacity) / self.mass)
+        return self.base_fuel_consumption * e ** ((self.fuel + self.used_capacity) / self.drone_mass)
 
     @property
     def path_length(self):
@@ -109,6 +109,7 @@ class Drone(object):
 
     def is_possible(self):
         """Check whether such a cargo is possible to be delivered in one go."""
+        # TODO Refactoring.
         self.position = self.base
         cargo_weight = sum(parcel.weight for parcel in self.cargo)
         if cargo_weight > self.max_capacity:
@@ -118,46 +119,46 @@ class Drone(object):
         for parcel in self.cargo:
             distance = dist(self.position, parcel.position)
             velocity = self.absolute_speed(self.position, parcel.position)
-            # TODO Include wind and reloading/preparing times. Check it.
             self.position = parcel.position
-            time = distance / velocity + self.loading_time
-            fuel_cost = self.fuel_consumption * time
-            self.fuel -= fuel_cost
+            flight_time = (distance + 2 * self.factor * self.altitude) / velocity
+            self.fuel -= self.fuel_consumption * flight_time
             self.used_capacity -= parcel.weight
             if self.fuel < 0:
                 return False
         distance = dist(self.position, self.base)
         velocity = self.absolute_speed(self.position, self.base)
-        # TODO Include wind and reloading/preparing times. Check it.
-        time = distance / velocity + self.loading_time
-        fuel_cost = self.fuel_consumption * time
+        self.position = self.base
+        flight_time = (distance + 2 * self.factor * self.altitude) / velocity
+        self.fuel -= self.fuel_consumption * flight_time
         if self.fuel < 0:
             return False
         return True
 
     def trip_time(self, cargo):
         """Calculate time needed to deliver cargo."""
+        # TODO Refactoring.
+        if not cargo:
+            return 0
         total_time = 0
-        position = self.base
-        cargo_weight = sum(parcel.weight for parcel in cargo)
-        self.used_capacity = cargo_weight
+        self.position = self.base
+        self.used_capacity = sum(parcel.weight for parcel in cargo)
         self.fuel = self.max_fuel
         for parcel in cargo:
-            distance = dist(position, parcel.position)
+            distance = dist(self.position, parcel.position)
             velocity = self.absolute_speed(self.position, parcel.position)
-            position = parcel.position
-            # TODO Include wind and reloading/preparing times. Check it.
-            time = distance / velocity + self.loading_time
-            total_time += time
-            fuel_cost = self.fuel_consumption * time
-            self.fuel -= fuel_cost
+            self.position = parcel.position
+            flight_time = (distance + 2 * self.factor * self.altitude) / velocity
+            total_time += flight_time
+            total_time += self.waiting_at_client
+            self.fuel -= self.fuel_consumption * flight_time
             self.used_capacity -= parcel.weight
-        distance = dist(position, self.base)
+        distance = dist(self.position, self.base)
         velocity = self.absolute_speed(self.position, self.base)
-        # TODO Include wind and reloading/preparing times. Check it.
-        time = distance / velocity + self.loading_time
-        total_time += time
-        fuel_cost = self.fuel_consumption * time
+        self.position = self.base
+        flight_time = (distance + 2 * self.factor * self.altitude) / velocity
+        total_time += flight_time
+        total_time += self.waiting_at_base
+        self.fuel -= self.fuel_consumption * flight_time
         return total_time
 
     def absolute_speed(self, start_position, end_position):
