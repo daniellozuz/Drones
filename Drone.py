@@ -1,9 +1,6 @@
 """Provides drone implementation."""
 
-# TODO implement interface for external specification of drone parameters, that is:
-# formulae/discrete characteristics of fuel_consumption or max_speed.
-
-from math import e, sqrt, sin, cos, atan2
+from math import e, sqrt, sin, cos, atan2, inf
 from random import randrange
 
 from common import Position as Pos
@@ -13,7 +10,7 @@ from Parcel import Parcel
 class Drone(object):
     """Provides drone implementation."""
 
-    def __init__(self, number, max_capacity, max_speed, base=Pos(0, 0), parcels=None,
+    def __init__(self, number, max_capacity=inf, max_speed=20, base=Pos(0, 0), parcels=None,
                  drone_mass=20, max_fuel=5, wind=(0, 0), loading_time=5, base_fuel_consumption=0.001):
         self.position = base
         self.number = number
@@ -30,7 +27,12 @@ class Drone(object):
             parcels = []
         self.parcels = parcels
         self.wind = wind
-        self.loading_time = loading_time # Rising + falling + refuelling + maintenance + reloading
+        # TODO change it to appropriate altitude or add it.
+        #                                      (Altitude)        (Waiting time (at client + at base))
+        self.loading_time = loading_time # (Rising + falling) + (refuelling + maintenance + reloading)
+        # self.waiting_at_client = waiting_at_client
+        # self.waiting_at_base = waiting_at_base
+        # self.altitude = altitude
 
     def __add__(self, parcels):
         if isinstance(parcels, Parcel):
@@ -87,8 +89,7 @@ class Drone(object):
     @property
     def total_time(self):
         """Calculate everything inside this function, then separate it into a few if possible."""
-        # TODO add constant time of landing / starting / refuelling-preparing to flight.
-        # (where? included in fuel_consumption? - is_possible or trip_time or total_time)
+        # TODO In the metric include every parameter from the constructor.
         self.used_capacity = 0
         total_time = 0
         self.fuel = self.max_fuel
@@ -117,7 +118,7 @@ class Drone(object):
         for parcel in self.cargo:
             distance = dist(self.position, parcel.position)
             velocity = self.absolute_speed(self.position, parcel.position)
-            # include wind and reloading/preparing times. TODO check it.
+            # TODO Include wind and reloading/preparing times. Check it.
             self.position = parcel.position
             time = distance / velocity + self.loading_time
             fuel_cost = self.fuel_consumption * time
@@ -127,7 +128,7 @@ class Drone(object):
                 return False
         distance = dist(self.position, self.base)
         velocity = self.absolute_speed(self.position, self.base)
-        # include wind and reloading/preparing times. TODO check it.
+        # TODO Include wind and reloading/preparing times. Check it.
         time = distance / velocity + self.loading_time
         fuel_cost = self.fuel_consumption * time
         if self.fuel < 0:
@@ -145,7 +146,7 @@ class Drone(object):
             distance = dist(position, parcel.position)
             velocity = self.absolute_speed(self.position, parcel.position)
             position = parcel.position
-            # include wind and reloading/preparing times. TODO check it.
+            # TODO Include wind and reloading/preparing times. Check it.
             time = distance / velocity + self.loading_time
             total_time += time
             fuel_cost = self.fuel_consumption * time
@@ -153,7 +154,7 @@ class Drone(object):
             self.used_capacity -= parcel.weight
         distance = dist(position, self.base)
         velocity = self.absolute_speed(self.position, self.base)
-        # include wind and reloading/preparing times. TODO check it.
+        # TODO Include wind and reloading/preparing times. Check it.
         time = distance / velocity + self.loading_time
         total_time += time
         fuel_cost = self.fuel_consumption * time

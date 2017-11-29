@@ -13,7 +13,7 @@ def show_parcels(city, test=False):
     plt.plot(x_positions, y_positions, 'ro')
     plt.plot(city.position.x, city.position.y, 'go')
 
-def show_drone_paths(city, final=False, test=False):
+def show_drone_paths(city, final=False, test=False, show_solution=True):
     """Shows drones paths on a map."""
     if test:
         return
@@ -27,7 +27,7 @@ def show_drone_paths(city, final=False, test=False):
             plt.plot(*zip(*drone.path))
         else:
             print("Error: no path to be displayed.")
-    if city.solution:
+    if city.solution and show_solution:
         percentage = int(100 * (city.total_cost - city.solution) / city.solution)
         plt.title('Total cost: ' + str(round(city.total_cost)) + ' Solution: ' +\
                   str(city.solution) + ' (+' + str(percentage) + '% overshoot)')
@@ -48,11 +48,11 @@ def show_distance_history(city, test=False):
     plt.legend()
     plt.show()
 
-def show_test_results(version='test_TSP'):
+def show_test_results(ver='test_TSP'):
     """Plots all test results (so far TSP only)."""
-    result_files = [f for f in os.listdir(os.path.join(version, 'test_results')) if f.endswith('.csv')]
+    result_files = [f for f in os.listdir(os.path.join(ver, 'test_results')) if f.endswith('.csv')]
     for result_file in result_files:
-        with open(os.path.join(version, 'test_results', result_file)) as test_result:
+        with open(os.path.join(ver, 'test_results', result_file)) as test_result:
             reader = csv.reader(test_result)
             data = []
             legend = []

@@ -18,7 +18,7 @@ import plots
 class City():
     """Engine implementation and main interface."""
 
-    def __init__(self, position=Pos(0, 0), wind=(0, 0), metric='total_time'):
+    def __init__(self, position=Pos(0, 0), wind=(0, 0), metric='full'):
         self.metric = metric
         self.scale = None
         self.solution = None
@@ -60,6 +60,7 @@ class City():
 
     def jload(self, json_file_name):
         """Loads data from json .txt file stored in "test_json" folder."""
+        # TODO Add full drone spec.
         with open(os.path.join("json_test", json_file_name)) as json_file:
             data = json.load(json_file)
         self.wind = tuple(data['wind'])
@@ -105,6 +106,7 @@ class City():
 
     def store(self, json_file_name):
         """Stores data (city parameters, drones and parcels) to json .txt file."""
+        # TODO Add whole drone spec.
         data = {}
         data['wind'] = list(self.wind)
         data['position'] = [self.position.x, self.position.y]
@@ -140,7 +142,7 @@ class City():
         """Returns total distance or time covered by drones (depending on metric used)."""
         if self.metric == 'simple':
             self.total_cost = sum(drone.path_length for drone in self.drones)
-        if self.metric == 'total_time':
+        if self.metric == 'full':
             self.total_cost = max(drone.total_time for drone in self.drones)
 
     def calculate_scale(self):
@@ -210,12 +212,12 @@ class City():
                                     str(self.solution), str(overshoot)])
 
     def full_simulated_annealing(self, initial_temperature=10, final_temperature=0.001,
-                                 iterations=10_000, test=False):
+                                 iterations=10_000, test=False, show_solution=True):
         """Loops over sim annealing."""
         cooling_rate = pow(final_temperature / initial_temperature, 1 / iterations)
         self.prepare_algorithm()
         plots.show_parcels(self, test=test)
-        plots.show_drone_paths(self, test=test)
+        plots.show_drone_paths(self, test=test, show_solution=show_solution)
         prev_best = self.total_cost
         prev = self.total_cost
         temperature = initial_temperature
@@ -227,9 +229,9 @@ class City():
             temperature *= cooling_rate
             prev = self.total_cost
             if self.total_cost < prev_best:
-                plots.show_drone_paths(self, test=test)
+                plots.show_drone_paths(self, test=test, show_solution=show_solution)
                 prev_best = self.total_cost
-        plots.show_drone_paths(self, final=True, test=test)
+        plots.show_drone_paths(self, final=True, test=test, show_solution=show_solution)
         plots.show_distance_history(self, test=test)
 
     def iteration(self, temperature, test=False):
