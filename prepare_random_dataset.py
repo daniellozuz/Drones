@@ -8,22 +8,22 @@ import plots
 from random import randint, uniform
 
 CITY = {'position': (0, 0),
-        'wind': (2, 1)}
+        'wind': (0, 0)}
 
-DRONE = {'amount': (3, 4),
-         'mass': (10, 30),
-         'capacity': (20, 25),
-         'speed': (12, 18),
-         'fuel': (3, 5),
-         'consumption': (0.001, 0.003),
-         'altitude': (50, 70),
-         'factor': (2.5, 3),
-         'waiting_at_base': (50, 100),
-         'waiting_at_client': (30, 60)}
+DRONE = {'amount': (4, 4),
+         'mass': (30, 30),
+         'capacity': (25000, 25000),
+         'speed': (18, 18),
+         'fuel': (5, 5),
+         'consumption': (0, 0),
+         'altitude': (0, 0),
+         'factor': (3, 3),
+         'waiting_at_base': (0, 0),
+         'waiting_at_client': (0, 0)}
 
-PARCEL = {'amount': (40, 50),
+PARCEL = {'amount': (20, 20),
           'position': (-18_000, 18_000),
-          'weight': (0.1, 5)}
+          'weight': (0, 0)}
 
 city = City(position=Pos(*CITY['position']), wind=CITY['wind'])
 

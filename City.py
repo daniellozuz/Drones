@@ -152,7 +152,7 @@ class City():
         max_y = max([parcel.position.y for parcel in self.parcels])
         min_x = min([parcel.position.x for parcel in self.parcels])
         min_y = min([parcel.position.y for parcel in self.parcels])
-        self.scale = max(max_x - min_x, max_y - min_y)
+        self.scale = max(max_x - min_x, max_y - min_y) ** 2
 
     def test_everything(self, iterations=1000, initial_temperature=10, final_temperature=0.001):
         """Performs simulated annealing for all test cases and creates .txt file with summary."""
