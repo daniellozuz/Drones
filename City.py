@@ -143,7 +143,8 @@ class City():
         if self.metric == 'simple':
             self.total_cost = sum(drone.path_length for drone in self.drones)
         if self.metric == 'full':
-            self.total_cost = max(drone.total_time for drone in self.drones)
+            self.total_cost = sum(drone.total_time ** 2 for drone in self.drones)
+            print(max(drone.total_time for drone in self.drones))
 
     def calculate_scale(self):
         """Calculates scale according to data range."""

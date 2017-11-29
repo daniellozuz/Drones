@@ -26,9 +26,6 @@ class Drone(object):
         self.base_fuel_consumption = base_fuel_consumption
         self.parcels = []
         self.cargo = []
-        # TODO change it to appropriate altitude or add it.
-        #                                      (Altitude)        (Waiting time (at client + at base))
-        #self.loading_time = loading_time # (Rising + falling) + (refuelling + maintenance + reloading)
         self.altitude = altitude
         self.factor = factor
         self.waiting_at_base = waiting_at_base
