@@ -12,8 +12,8 @@ import plots
 # City creation
 city = City()
 city.cload("punktykrakow.txt")
-city += Drone(1, 24000, 16, base=city.position)
-city += Drone(2, 24000, 8, base=city.position)
+city += Drone(1, max_capacity=24000, max_speed=16, base=city.position)
+city += Drone(2, max_capacity=24000, max_speed=8, base=city.position)
 
 # Computations
 city.full_simulated_annealing(iterations=10000, initial_temperature=10, final_temperature=0.0001, show_solution=False)
@@ -32,8 +32,8 @@ city.full_simulated_annealing(iterations=10000, initial_temperature=10, final_te
 # city += Parcel(2, 6, Pos(-1000, 0))
 # city += Parcel(3, 2, Pos(1100, 100))
 # city += Parcel(4, 2, Pos(-1100, 100))
-# city += Drone(1, 10, 10)
-# city += Drone(2, 10, 10)
+# city += Drone(1, max_capacity=10, max_speed=10)
+# city += Drone(2, max_capacity=10, max_speed=10)
 # city.store('test1.txt')
 
 # city.full_simulated_annealing()
@@ -48,7 +48,7 @@ city.full_simulated_annealing(iterations=10000, initial_temperature=10, final_te
 
 # # Przyklad - Testowanie zaleznosci od iteracji.
 # city = City(metric='simple')
-# city += Drone(1, 24000, 8, base=city.position)
+# city += Drone(1, max_capacity=24000, max_speed=8, base=city.position)
 # city.test_tsp(iterations=1000, initial_temperature=10000000, final_temperature=1000)
 # city.test_tsp(iterations=5000, initial_temperature=0.00001, final_temperature=0.000000001)
 # city.test_tsp(iterations=10000, initial_temperature=10000, final_temperature=1)
@@ -56,7 +56,7 @@ city.full_simulated_annealing(iterations=10000, initial_temperature=10, final_te
 
 # Przyklad - Testowanie zaleznosci od temperatury.
 # city = City(metric='simple')
-# city += Drone(1, 24000, 8, base=city.position)
+# city += Drone(1, max_capacity=24000, max_speed=8, base=city.position)
 # city.test_tsp(iterations=10000, initial_temperature=10000000000000, final_temperature=1000000000)
 # city.test_tsp(iterations=10000, initial_temperature=10000000000, final_temperature=1000000)
 # city.test_tsp(iterations=10000, initial_temperature=10000000, final_temperature=1000)
@@ -71,6 +71,6 @@ city.full_simulated_annealing(iterations=10000, initial_temperature=10, final_te
 # # Przyklad - Separacja na dwie strefy.
 # city = City()
 # city.cload("punktykrakow.txt")
-# city += Drone(1, 24000, 8, base=city.position)
-# city += Drone(2, 24000, 8, base=city.position)
+# city += Drone(1, max_capacity=24000, max_speed=8, base=city.position)
+# city += Drone(2, max_capacity=24000, max_speed=8, base=city.position)
 # city.full_simulated_annealing(iterations=10000, initial_temperature=10, final_temperature=0.001)

@@ -15,8 +15,8 @@ class TestDrone(unittest.TestCase):
     def setUp(self):
         """Prepare environment for testing."""
 
-        self.drone0 = Drone(0, 50, 10) # Empty drone
-        self.drone1 = Drone(1, 140, 8) # Drone with parcels
+        self.drone0 = Drone(0, max_capacity=50, max_speed=10) # Empty drone
+        self.drone1 = Drone(1, max_capacity=140, max_speed=8) # Drone with parcels
 
         self.parcel1 = Parcel(1, Pos(1, 1), 10)
         self.parcel2 = Parcel(2, Pos(-20, -1), 5)
@@ -59,9 +59,6 @@ class TestDrone(unittest.TestCase):
         self.assertEqual(self.drone1.path_length, 42.53422106660287)
         self.assertEqual(len(self.drone0.path), 2)
         self.assertEqual(len(self.drone1.path), 4)
-
-
-
 
 
 if __name__ == '__main__':

@@ -17,10 +17,10 @@ class TestCity(unittest.TestCase):
     def setUp(self):
         """Prepare environment for testing."""
 
-        self.city = City(position=Pos(0, 0), wind=(1, 2))
+        self.city = City(position=Pos(0, 0), wind=(1, 2), metric='simple')
 
-        self.drone0 = Drone(0, 50, 10) # Empty drone
-        self.drone1 = Drone(1, 140, 8) # Drone with parcels
+        self.drone0 = Drone(0, max_capacity=50, max_speed=10) # Empty drone
+        self.drone1 = Drone(1, max_capacity=140, max_speed=8) # Drone with parcels
 
         self.parcel1 = Parcel(1, Pos(1, 1), 10)
         self.parcel2 = Parcel(2, Pos(-20, -1), 5)
@@ -80,47 +80,6 @@ class TestCity(unittest.TestCase):
         self.city.prepare_algorithm()
 
         self.assertEqual(self.city.total_cost, 2.8284271247461903)
-
-
-    def test_jload(self):
-        """Checks loading data from json formatted txt file."""
-
-        self.city += self.drone0
-        self.city += self.parcel1
-
-        self.assertEqual(self.city.drones, [self.drone0])
-        self.assertEqual(self.city.parcels, [self.parcel1])
-
-        self.city.jload("stub.txt")
-
-        self.assertEqual(len(self.city.drones), 2)
-        self.assertIsInstance(self.city.drones[0], Drone)
-        self.assertIsInstance(self.city.drones[1], Drone)
-        self.assertEqual(len(self.city.parcels), 2)
-        self.assertIsInstance(self.city.parcels[0], Parcel)
-        self.assertIsInstance(self.city.parcels[1], Parcel)
-
-
-    def test_store(self):
-        """Checks storing data to json formatted txt file."""
-
-        self.city.jload("stub.txt")
-        self.city.store("stub2.txt")
-        self.city.drones = []
-        self.city.parcels = []
-
-        self.assertEqual(self.city.drones, [])
-        self.assertEqual(self.city.parcels, [])
-
-        self.city.jload("stub2.txt")
-
-        self.assertEqual(len(self.city.drones), 2)
-        self.assertEqual(len(self.city.parcels), 2)
-        self.assertIsInstance(self.city.parcels[0], Parcel)
-        self.assertIsInstance(self.city.parcels[1], Parcel)
-
-
-
 
 
 if __name__ == '__main__':
