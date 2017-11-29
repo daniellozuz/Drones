@@ -21,7 +21,7 @@ DRONE = {'amount': (4, 4),
          'waiting_at_base': (0, 0),
          'waiting_at_client': (0, 0)}
 
-PARCEL = {'amount': (20, 20),
+PARCEL = {'amount': (50, 50),
           'position': (-18_000, 18_000),
           'weight': (0, 0)}
 

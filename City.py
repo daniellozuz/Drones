@@ -144,6 +144,7 @@ class City():
             self.total_cost = sum(drone.path_length for drone in self.drones)
         if self.metric == 'full':
             self.total_cost = sum(drone.total_time ** 2 for drone in self.drones)
+            # Sum of squares kinda works; min as well. Sum of squares seems to be a bit better.
             print(max(drone.total_time for drone in self.drones))
 
     def calculate_scale(self):
